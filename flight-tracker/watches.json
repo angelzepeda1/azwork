@@ -12,5 +12,19 @@
     "alert_threshold": 10,
     "recipient": "6195777882",
     "enabled": true
+  },
+  {
+    "id": "sfo-san-nov27-29",
+    "label": "SFO → San Diego, Nov 27–29 2026",
+    "origin": "SFO",
+    "destination": "SAN",
+    "departure_date": "2026-11-27",
+    "return_date": "2026-11-29",
+    "passengers": 1,
+    "cabin_class": "economy",
+    "alert_type": "percent",
+    "alert_threshold": 10,
+    "recipient": "6195777882",
+    "enabled": true
   }
 ]
