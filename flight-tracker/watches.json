@@ -1,0 +1,16 @@
+[
+  {
+    "id": "sfo-san-sep25-27",
+    "label": "SFO → San Diego, Sep 25–27 2026",
+    "origin": "SFO",
+    "destination": "SAN",
+    "departure_date": "2026-09-25",
+    "return_date": "2026-09-27",
+    "passengers": 1,
+    "cabin_class": "economy",
+    "alert_type": "percent",
+    "alert_threshold": 10,
+    "recipient": "6195777882",
+    "enabled": true
+  }
+]

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.angelzepeda.flight-price-watch</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/angelzepeda/.local/bin/claude</string>
+    <string>-p</string>
+    <string>Read and follow every step in Scheduled/flight-price-watch/SKILL.md at the root of this repo, in order.</string>
+    <string>--allowedTools</string>
+    <string>Read Write Edit Bash mcp__claude_ai_Otto_Travel__read_skill mcp__claude_ai_Otto_Travel__search_flights mcp__claude_ai_Otto_Travel__task_status mcp__claude_ai_Otto_Travel__query_flights</string>
+    <string>--permission-mode</string>
+    <string>acceptEdits</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/angelzepeda/Documents/Claude/Projects/Personal Tasks</string>
+
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>0</integer><key>Minute</key><integer>12</integer></dict>
+    <dict><key>Hour</key><integer>6</integer><key>Minute</key><integer>12</integer></dict>
+    <dict><key>Hour</key><integer>12</integer><key>Minute</key><integer>12</integer></dict>
+    <dict><key>Hour</key><integer>18</integer><key>Minute</key><integer>12</integer></dict>
+  </array>
+
+  <key>StandardOutPath</key>
+  <string>/Users/angelzepeda/Library/Logs/flight-price-watch.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/angelzepeda/Library/Logs/flight-price-watch.err.log</string>
+
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>
