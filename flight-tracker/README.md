@@ -23,15 +23,18 @@ schedule, tracks price history, and texts you when the price drops enough to mat
 | `passengers`, `cabin_class` | Passed straight to Otto Travel's flight search. |
 | `alert_type` | `"percent"` or `"amount"`. |
 | `alert_threshold` | Number — e.g. `10` for percent means "alert on a 10%+ drop from the last check"; for amount, a dollar figure. |
-| `recipient` | Phone number/contact the iMessage alert goes to. |
+| `recipient` | Phone number the SMS alert goes to, in E.164 format (e.g. `+16195777882`). |
 | `enabled` | Set `false` to pause a watch without removing its history. |
 
 ## How it runs
 
-Every check needs a real macOS Messages.app session to send iMessage, so this runs as a
-**local** launchd job (`~/Library/LaunchAgents/com.angelzepeda.flight-price-watch.plist`),
-not a cloud routine — cloud sandboxes can't send iMessages. See the skill file for the
-full step-by-step.
+This runs as a **cloud routine** (via RemoteTrigger, see `claude.ai/code/routines`) — a
+fresh clone every 6 hours, no dependency on this Mac being on, awake, or charged. Alerts go
+out as an SMS via the Quo connector (`send-message`, from the Detail Smart WestLA number)
+rather than iMessage, since a cloud sandbox has no Messages.app. Gmail was considered but
+its connector can only create an unsent draft, not actually send — not a real notification.
+Each run pushes its own changes (`price-history.json`, `index.html`) back to `origin main`,
+so pull locally to see the latest. See the skill file for the full step-by-step.
 
 ## Otto Travel quota note
 

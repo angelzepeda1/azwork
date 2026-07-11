@@ -1,10 +1,12 @@
 ---
 name: flight-price-watch
-description: Checks every watched flight route/date in flight-tracker/watches.json and iMessages an alert when the price drops enough
+description: Checks every watched flight route/date in flight-tracker/watches.json and texts an alert when the price drops enough
 ---
 
-This runs LOCALLY (launchd), not as a cloud routine — iMessage delivery requires the real
-Messages.app on this Mac, which a cloud sandbox does not have.
+This runs as a CLOUD routine (not local launchd) — a fresh clone each time, no dependency on
+the owner's Mac being awake or charged. Alerts go out as an SMS via the Quo connector (a real
+send, unlike Gmail which can only create an unsent draft) rather than iMessage, since a cloud
+sandbox has no Messages.app.
 
 ## Step 1 — Load the watch list
 Read `flight-tracker/watches.json` (relative to this project root). Skip any watch with
@@ -41,16 +43,13 @@ Per the watch's `alert_type`:
 Only alert on a genuine drop (current_price < last_price) — a price increase or unchanged
 price is never an alert, no matter the math above.
 
-## Step 5 — Send the iMessage (only if Step 4 says to)
-Use Bash with `osascript` — no MCP tool needed:
-```
-osascript -e 'tell application "Messages" to send "MESSAGE_TEXT" to buddy "RECIPIENT" of (service 1 whose service type = iMessage)'
-```
-Message format: "✈️ Fare drop: [label] is now $[current_price] (was $[last_price], down
-[X]% / $[Y]) — [alert_threshold]%/$ threshold hit. Route: [origin]→[destination], depart
-[departure_date]" + return date if round-trip.
-Substitute the watch's own `recipient` for RECIPIENT. Escape any double quotes in the
-message text for the shell.
+## Step 5 — Send the SMS alert (only if Step 4 says to)
+Call `mcp__claude_ai_Quo__send-message`:
+- `from`: `"+14242168638"` (the Detail Smart WestLA Quo inbox)
+- `to`: the watch's `recipient`, in E.164 format (e.g. `"+16195777882"`)
+- `content`: "✈️ Fare drop: [label] is now $[current_price] (was $[last_price], down [X]% /
+  $[Y]) — [alert_threshold]%/$ threshold hit. Route: [origin]→[destination], depart
+  [departure_date]" + return date if round-trip.
 
 ## Step 6 — Record this check
 Regardless of whether an alert fired, append `{ "checked_at": <UTC ISO timestamp now>,
@@ -84,8 +83,16 @@ Read the saved URL from `flight-tracker/ARTIFACT_URL.txt`. Call the Artifact too
 redeploys in place. (Only omit `url` if that file is missing/empty — a first-time publish —
 in which case save the newly returned URL back to that file.)
 
-## Step 8 — Report
+## Step 8 — Commit and push
+This runs off a fresh clone each time, so the change only persists if pushed. `git add
+flight-tracker/price-history.json flight-tracker/index.html`, commit with a short message
+like "Fare check: [today's date]", and push to `origin main`. If the push is rejected
+(diverged history), `git pull --rebase origin main` once and retry; never force-push. If
+there were no changes to either file this run (shouldn't normally happen — Step 6 always
+appends), skip the commit.
+
+## Step 9 — Report
 If running interactively, give a one-line summary per watch (current price, change since
 last check, alert sent or not) plus the dashboard link. If any watch's search failed this
 run, mention it. This runs unattended most of the time — there is no chat to post to when
-launchd fires it, so this summary is for the log file / a manual test run.
+the routine fires, so this summary is for a manual test run.
