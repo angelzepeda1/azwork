@@ -12,6 +12,7 @@ Every morning, pull fresh data for the Detail Smart dashboard and update the art
 - ALWAYS INCLUDE THE CLIENT'S NAME first in each appointment's notes (resolve customer_id → given_name + family_name via customers.get — method is "get", not "retrieve"). Then service, vehicle, address, detailer, payment tag.
 - The dashboard appointment feed must MATCH the Square Appointments calendar exactly (same count, same people). Bucket each booking by its start_at in PT — a 7:00 PM PT appointment has a start_at after midnight UTC, so always compare against the -07:00 week boundaries, not raw UTC dates.
 - Always keep the dashboard up to date each run, even if every number is zero (a genuinely quiet week is valid data).
+- BACKLOG INTEGRITY: every run also repairs past weeks, not just the current one — see Step 3.5. A "—" placeholder or a null `calls` field on a past week means an earlier run failed partway through; it is not a real value and should never be left standing if it can be filled in.
 
 ## Step 0 — Calculate the week window (LA time, UTC-7)
 Determine today's date in LA time. Find the most recent Monday (if today IS Monday, that's the start).
@@ -57,9 +58,31 @@ Parse:
 - If the Gmail search fails, skip and keep last known review data
 Note: Gmail gets a notification from businessprofile-noreply@google.com per new review — most reliable auto-detection.
 
+## Step 3.5 — Backfill incomplete historical weeks
+Read the current HTML from `dashboards/detail-smart/index.html` and scan every WEEKS entry EXCEPT the
+current (last) one for signs of a failed prior run:
+- Square gap: revenue, orders, avgPerJob, or bookings is the placeholder string "—", or apptTag contains
+  "unavailable" / "needs re-auth".
+- Quo gap: calls is null.
+For each incomplete week found, oldest first, cap at 3 weeks per run (bounds runtime; any remainder gets
+picked up on a later day — do not try to clear a large backlog in one run):
+- Parse that week's own label to reconstruct its weekStart/weekEnd (LA time, UTC-7), the same way Step 0
+  does for the current week.
+- Re-run Step 1 (Square bookings + revenue) and/or Step 2 (Quo calls), scoped to that historical window,
+  for whichever half is missing.
+- On success, overwrite ONLY the placeholder/null fields with the real values, rebuild that week's
+  appointments array the same way Step 1 does, and clear the "unavailable"/"needs re-auth" note from
+  apptTag (reset it to "Square Bookings").
+- On failure, leave that week's placeholders untouched (don't invent numbers) and leave apptTag as-is so
+  the next run retries it.
+- Never touch a past week's `reviews` object — the review count/rating is a cumulative running total
+  carried forward day to day, not independently recomputable per week, so already-recorded review data for
+  prior weeks is left alone even if you can't verify it.
+If any weeks are still incomplete after this run (either skipped due to the 3-week cap, or failed again),
+list them by label in the morning briefing's "Heads up:" line so the owner knows the backlog isn't fully
+clean yet.
+
 ## Step 4 — Rebuild the full dashboard HTML
-This dashboard now lives in this repo, not as a Claude Desktop artifact. Read the current HTML directly
-from `dashboards/detail-smart/index.html` (relative to this project root).
 Update the WEEKS array entry for the current week (the last entry) with all fresh data:
 - revenue, orders (paid-job count), avgPerJob, bookings
 - calls object (or keep last known if Quo failed)
