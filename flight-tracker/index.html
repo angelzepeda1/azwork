@@ -1,0 +1,376 @@
+<title>SFO ⇄ SAN — Fare Watch</title>
+<style>
+  :root {
+    --ink: #141a2e;
+    --ink-soft: #454c63;
+    --ink-muted: #767c8f;
+    --paper: #e9e7df;
+    --card: #fbfaf7;
+    --card-border: #dcd9cd;
+    --amber: #b97e26;
+    --amber-soft: #ecdcb9;
+    --good: #1f7a54;
+    --good-bg: #e3efe6;
+    --warn: #b04a30;
+    --warn-bg: #f3e4de;
+    --hairline: #d3cfc2;
+    --series-1: #2a78d6;
+    --series-2: #1baf7a;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #eee8d8;
+      --ink-soft: #a9a48f;
+      --ink-muted: #7d7a6c;
+      --paper: #17181c;
+      --card: #1e2024;
+      --card-border: #33353a;
+      --amber: #d9a752;
+      --amber-soft: #3a3020;
+      --good: #5cc496;
+      --good-bg: #17281f;
+      --warn: #e2836a;
+      --warn-bg: #2c1e19;
+      --hairline: #34353a;
+      --series-1: #3987e5;
+      --series-2: #199e70;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #eee8d8; --ink-soft: #a9a48f; --ink-muted: #7d7a6c;
+    --paper: #17181c; --card: #1e2024; --card-border: #33353a;
+    --amber: #d9a752; --amber-soft: #3a3020;
+    --good: #5cc496; --good-bg: #17281f; --warn: #e2836a; --warn-bg: #2c1e19;
+    --hairline: #34353a; --series-1: #3987e5; --series-2: #199e70;
+  }
+  :root[data-theme="light"] {
+    --ink: #141a2e; --ink-soft: #454c63; --ink-muted: #767c8f;
+    --paper: #e9e7df; --card: #fbfaf7; --card-border: #dcd9cd;
+    --amber: #b97e26; --amber-soft: #ecdcb9;
+    --good: #1f7a54; --good-bg: #e3efe6; --warn: #b04a30; --warn-bg: #f3e4de;
+    --hairline: #d3cfc2; --series-1: #2a78d6; --series-2: #1baf7a;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    padding: clamp(20px, 5vw, 56px) clamp(16px, 6vw, 64px) 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    max-width: 920px;
+    margin: 0 auto;
+  }
+
+  .kicker { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--amber); }
+  h1 { margin: 6px 0 0; font-size: clamp(24px, 3.4vw, 32px); font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; }
+  h2 { margin: 0; font-size: 15px; font-weight: 700; letter-spacing: -0.005em; }
+  .sub { margin-top: 6px; font-size: 14px; color: var(--ink-soft); max-width: 62ch; }
+  .meta-row {
+    display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 14px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11.5px;
+    color: var(--ink-soft); letter-spacing: 0.02em;
+  }
+  .meta-row b { color: var(--ink); font-weight: 600; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; }
+
+  .pass {
+    position: relative; background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 4px; overflow: hidden; box-shadow: 0 1px 2px rgba(20, 26, 46, 0.05);
+  }
+  .pass-stub { padding: 20px 22px 18px; }
+  .route-line {
+    display: flex; align-items: center; gap: 10px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 22px; font-weight: 600;
+    letter-spacing: 0.01em; font-variant-numeric: tabular-nums;
+  }
+  .route-line .city { color: var(--ink); }
+  .route-line .track {
+    flex: 1; position: relative; height: 1px;
+    background: repeating-linear-gradient(to right, var(--ink-soft) 0 4px, transparent 4px 9px);
+    min-width: 28px;
+  }
+  .route-line .track::after {
+    content: ""; position: absolute; right: -2px; top: 50%; transform: translateY(-50%);
+    width: 5px; height: 5px; border-radius: 50%; background: var(--amber);
+  }
+  .dates { margin-top: 8px; font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .dates b { color: var(--ink); font-weight: 600; }
+
+  .perf { position: relative; height: 0; border-top: 1.5px dashed var(--hairline); }
+  .perf::before, .perf::after {
+    content: ""; position: absolute; top: -8px; width: 16px; height: 16px; border-radius: 50%; background: var(--paper);
+  }
+  .perf::before { left: -8px; }
+  .perf::after { right: -8px; }
+
+  .pass-price { padding: 18px 22px 22px; display: flex; flex-direction: column; gap: 10px; }
+  .price-main { display: flex; align-items: baseline; gap: 10px; }
+  .price-main .amt {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 34px; font-weight: 700;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  }
+  .price-main .cabin-note { font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.06em; }
+  .price-alt { font-size: 12.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .price-alt b { color: var(--ink); font-weight: 600; }
+
+  .row-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 2px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.03em; padding: 4px 9px; border-radius: 100px;
+  }
+  .pill.tracking { background: var(--amber-soft); color: var(--amber); }
+  .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .threshold { font-size: 11px; color: var(--ink-soft); font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+
+  .compare {
+    display: flex; align-items: center; gap: 14px; padding: 16px 20px;
+    border: 1px solid var(--card-border); border-radius: 4px; background: var(--card); font-size: 13.5px;
+  }
+  .compare .badge {
+    flex-shrink: 0; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-weight: 700; font-size: 13px;
+    padding: 5px 10px; border-radius: 4px; background: var(--warn-bg); color: var(--warn); font-variant-numeric: tabular-nums;
+  }
+  .compare p { margin: 0; color: var(--ink-soft); }
+  .compare p b { color: var(--ink); font-weight: 600; }
+
+  /* --- Price history chart --- */
+  .history {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 4px; padding: 20px 22px 18px;
+  }
+  .history-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .history-note { font-size: 12px; color: var(--ink-muted); }
+  .legend { display: flex; gap: 16px; margin-top: 14px; font-size: 12px; color: var(--ink-soft); }
+  .legend .key { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .swatch { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .chart-wrap { margin-top: 12px; position: relative; }
+  svg.chart { width: 100%; height: 220px; display: block; overflow: visible; }
+  .gridline { stroke: var(--hairline); stroke-width: 1; }
+  .axis-label { fill: var(--ink-muted); font-size: 10px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .series-line { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .series-dot { stroke-width: 2; stroke: var(--card); }
+  .dot-hit { fill: transparent; cursor: pointer; }
+  .end-label { font-size: 11px; font-weight: 600; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-variant-numeric: tabular-nums; }
+  .tooltip {
+    position: absolute; pointer-events: none; opacity: 0; transition: opacity 0.1s ease;
+    background: var(--ink); color: var(--card); font-size: 11.5px; padding: 6px 9px; border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; white-space: nowrap; transform: translate(-50%, -130%);
+    font-variant-numeric: tabular-nums;
+  }
+  .tooltip.show { opacity: 1; }
+
+  details.tablewrap { margin-top: 14px; }
+  details.tablewrap summary {
+    font-size: 12px; color: var(--ink-soft); cursor: pointer; user-select: none; list-style: none;
+  }
+  details.tablewrap summary::-webkit-details-marker { display: none; }
+  details.tablewrap summary::before { content: "▸ "; color: var(--ink-muted); }
+  details.tablewrap[open] summary::before { content: "▾ "; }
+  .hist-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; overflow-x: auto; }
+  .hist-table th { text-align: left; font-weight: 600; color: var(--ink-muted); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em; padding: 6px 8px; border-bottom: 1px solid var(--hairline); }
+  .hist-table td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); font-variant-numeric: tabular-nums; }
+  .hist-table td.price { font-weight: 600; }
+
+  footer { font-size: 11.5px; color: var(--ink-soft); border-top: 1px solid var(--hairline); padding-top: 14px; line-height: 1.6; }
+  footer code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; background: var(--amber-soft); color: var(--amber);
+    padding: 1px 5px; border-radius: 3px; font-size: 11px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pass { transition: box-shadow 0.2s ease, transform 0.2s ease; }
+    .pass:hover { box-shadow: 0 6px 18px rgba(20, 26, 46, 0.09); transform: translateY(-1px); }
+  }
+</style>
+
+<div class="kicker">Fare Watch — Personal</div>
+<h1>SFO ⇄ San Diego, two windows compared</h1>
+<p class="sub">Cheapest bookable round-trip fare pulled live via Otto Travel for each date option under consideration. Both are on a 10%-drop watch, checked every 6 hours.</p>
+<div class="meta-row">
+  <span>Last checked <b id="meta-updated">—</b></span>
+  <span>Passengers <b>1</b></span>
+  <span>Cabin <b>Economy</b></span>
+</div>
+
+<div class="cards" id="pass-cards"></div>
+
+<div class="compare" id="compare-bar"></div>
+
+<div class="history">
+  <div class="history-head">
+    <h2>Price history</h2>
+    <span class="history-note" id="history-note"></span>
+  </div>
+  <div class="legend">
+    <span class="key"><span class="swatch" style="background:var(--series-1)"></span>SFO→SAN, Sep 25–27</span>
+    <span class="key"><span class="swatch" style="background:var(--series-2)"></span>SFO→SAN, Nov 27–29</span>
+  </div>
+  <div class="chart-wrap">
+    <svg class="chart" id="chart" viewBox="0 0 860 220" preserveAspectRatio="none"></svg>
+    <div class="tooltip" id="tooltip"></div>
+  </div>
+  <details class="tablewrap">
+    <summary>Show as table</summary>
+    <table class="hist-table" id="hist-table">
+      <thead><tr><th>Checked</th><th>Sep 25–27</th><th>Nov 27–29</th></tr></thead>
+      <tbody id="hist-tbody"></tbody>
+    </table>
+  </details>
+</div>
+
+<footer>
+  Both routes are on <code>flight-tracker/watches.json</code>; every check appends to <code>price-history.json</code>.
+  This page is regenerated and republished automatically after every check (every 6 hours) — reload to see the latest.
+  iMessage alerts go to the number on file only when a fare drops 10%+ from its last check.
+</footer>
+
+<script>
+// ---- Embedded data (regenerated by the flight-price-watch skill each run) ----
+const HISTORY = {
+  "sfo-san-sep25-27": {
+    label: "Sep 25–27", color: "var(--series-1)", cabinCurrent: "Basic Econ.",
+    points: [{ t: "2026-07-11T22:46:20Z", p: 176.81 }]
+  },
+  "sfo-san-nov27-29": {
+    label: "Nov 27–29", color: "var(--series-2)", cabinCurrent: "Basic Econ.",
+    points: [{ t: "2026-07-11T22:50:52Z", p: 383.60 }]
+  }
+};
+const ALT_PRICE = { "sfo-san-sep25-27": 246.81, "sfo-san-nov27-29": 448.61 };
+const ROUTE_LABEL = { "sfo-san-sep25-27": ["Fri, Sep 25", "Sun, Sep 27"], "sfo-san-nov27-29": ["Fri, Nov 27", "Sun, Nov 29"] };
+const THRESHOLD = "alert >10% drop";
+
+function fmtUSD(n) { return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function fmtDateShort(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + " " +
+         d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+}
+
+// -- Render boarding-pass cards --
+const cardsEl = document.getElementById("pass-cards");
+let latestCheck = null;
+for (const id of Object.keys(HISTORY)) {
+  const h = HISTORY[id];
+  const last = h.points[h.points.length - 1];
+  if (!latestCheck || new Date(last.t) > new Date(latestCheck)) latestCheck = last.t;
+  const [d1, d2] = ROUTE_LABEL[id];
+  cardsEl.insertAdjacentHTML("beforeend", `
+    <div class="pass">
+      <div class="pass-stub">
+        <div class="route-line"><span class="city">SFO</span><span class="track"></span><span class="city">SAN</span></div>
+        <div class="dates"><b>${d1}</b> → <b>${d2}</b>, 2026</div>
+      </div>
+      <div class="perf"></div>
+      <div class="pass-price">
+        <div class="price-main"><span class="amt">${fmtUSD(last.p)}</span><span class="cabin-note">${h.cabinCurrent}</span></div>
+        <div class="price-alt">Standard Economy: <b>${fmtUSD(ALT_PRICE[id])}</b></div>
+        <div class="row-bottom"><span class="pill tracking">Tracking</span><span class="threshold">${THRESHOLD}</span></div>
+      </div>
+    </div>`);
+}
+document.getElementById("meta-updated").textContent = latestCheck ? fmtDateShort(latestCheck) + " PT" : "—";
+
+// -- Compare bar (Sep vs Nov, cheapest tier) --
+(function () {
+  const ids = Object.keys(HISTORY);
+  if (ids.length === 2) {
+    const [a, b] = ids.map(id => HISTORY[id].points[HISTORY[id].points.length - 1].p);
+    const diff = Math.abs(a - b);
+    const pct = Math.round((diff / Math.min(a, b)) * 100);
+    const cheaper = a < b ? HISTORY[ids[0]].label : HISTORY[ids[1]].label;
+    document.getElementById("compare-bar").innerHTML = `
+      <span class="badge">+${fmtUSD(diff)}</span>
+      <p>The pricier window currently runs <b>${pct}% more</b> than ${cheaper} at the cheapest fare tier.</p>`;
+  }
+})();
+
+// -- Chart --
+const W = 860, H = 220, PAD_L = 54, PAD_R = 16, PAD_T = 16, PAD_B = 28;
+const svg = document.getElementById("chart");
+const allPoints = Object.values(HISTORY).flatMap(h => h.points);
+const prices = allPoints.map(p => p.p);
+const times = allPoints.map(p => new Date(p.t).getTime());
+let minP = Math.min(...prices), maxP = Math.max(...prices);
+if (minP === maxP) { minP -= 20; maxP += 20; } // avoid a zero-height domain on a single reading
+const pad = (maxP - minP) * 0.12;
+minP = Math.max(0, minP - pad); maxP += pad;
+const minT = Math.min(...times), maxT = Math.max(...times);
+const tSpan = Math.max(maxT - minT, 1);
+
+function x(t) { return times.length <= 1 && new Date(t).getTime() === minT
+  ? PAD_L + (W - PAD_L - PAD_R) / 2
+  : PAD_L + ((new Date(t).getTime() - minT) / tSpan) * (W - PAD_L - PAD_R); }
+function y(p) { return PAD_T + (1 - (p - minP) / (maxP - minP)) * (H - PAD_T - PAD_B); }
+
+let svgHTML = "";
+// gridlines + y labels (4 rounded steps)
+const steps = 4;
+for (let i = 0; i <= steps; i++) {
+  const val = minP + ((maxP - minP) * i) / steps;
+  const yy = y(val);
+  svgHTML += `<line class="gridline" x1="${PAD_L}" y1="${yy}" x2="${W - PAD_R}" y2="${yy}"/>`;
+  svgHTML += `<text class="axis-label" x="${PAD_L - 8}" y="${yy + 3}" text-anchor="end">$${Math.round(val)}</text>`;
+}
+
+const tooltip = document.getElementById("tooltip");
+const tbody = document.getElementById("hist-tbody");
+const rowsByTime = {};
+
+for (const id of Object.keys(HISTORY)) {
+  const h = HISTORY[id];
+  const pts = h.points;
+  if (pts.length >= 2) {
+    const d = pts.map(p => `${x(p.t)},${y(p.p)}`).join(" ");
+    svgHTML += `<polyline class="series-line" points="${d}" style="stroke:${h.color}"/>`;
+  }
+  pts.forEach((p, i) => {
+    const cx = x(p.t), cy = y(p.p);
+    svgHTML += `<circle class="series-dot" cx="${cx}" cy="${cy}" r="4" style="fill:${h.color}"/>`;
+    svgHTML += `<circle class="dot-hit" cx="${cx}" cy="${cy}" r="10" data-label="${h.label}" data-price="${fmtUSD(p.p)}" data-t="${fmtDateShort(p.t)}"/>`;
+    if (i === pts.length - 1) {
+      const anchor = cx > W - PAD_R - 60 ? "end" : "start";
+      const dx = anchor === "end" ? -10 : 10;
+      svgHTML += `<text class="end-label" x="${cx + dx}" y="${cy - 10}" text-anchor="${anchor}" style="fill:${h.color}">${fmtUSD(p.p)}</text>`;
+    }
+    const key = p.t;
+    rowsByTime[key] = rowsByTime[key] || {};
+    rowsByTime[key][id] = p.p;
+  });
+}
+svg.innerHTML = svgHTML;
+
+// hover tooltip
+svg.querySelectorAll(".dot-hit").forEach(el => {
+  el.addEventListener("mouseenter", () => {
+    const r = el.getBoundingClientRect(), wr = svg.parentElement.getBoundingClientRect();
+    tooltip.textContent = `${el.dataset.label} · ${el.dataset.t} · ${el.dataset.price}`;
+    tooltip.style.left = (r.left - wr.left + r.width / 2) + "px";
+    tooltip.style.top = (r.top - wr.top) + "px";
+    tooltip.classList.add("show");
+  });
+  el.addEventListener("mouseleave", () => tooltip.classList.remove("show"));
+});
+
+// history note + table
+const totalChecks = Math.max(...Object.values(HISTORY).map(h => h.points.length));
+document.getElementById("history-note").textContent =
+  totalChecks <= 1 ? "1 check recorded — line appears after the next run" : `${totalChecks} checks recorded`;
+
+Object.keys(rowsByTime).sort().forEach(t => {
+  const row = rowsByTime[t];
+  tbody.insertAdjacentHTML("beforeend", `<tr>
+    <td>${fmtDateShort(t)}</td>
+    <td class="price">${row["sfo-san-sep25-27"] != null ? fmtUSD(row["sfo-san-sep25-27"]) : "—"}</td>
+    <td class="price">${row["sfo-san-nov27-29"] != null ? fmtUSD(row["sfo-san-nov27-29"]) : "—"}</td>
+  </tr>`);
+});
+</script>

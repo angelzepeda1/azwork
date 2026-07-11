@@ -22,7 +22,10 @@ For each watch:
   For round-trip watches this price is already the combined round-trip total (see
   `price_type='round_trip'` in the schema) — do not add outbound + return separately.
 - This is the cheapest bookable fare regardless of cabin (including Basic Economy), matching
-  what most fare trackers quote as "the price." Record it as `current_price`.
+  what most fare trackers quote as "the price." Record it as `current_price` and note its
+  `cabin` value.
+- Also run the same query with `AND fo.cabin != 'BASIC'` to get the cheapest standard-Economy
+  fare — record as `alt_price` (used only for display on the dashboard, not for alert math).
 - If the search errors or returns nothing, skip this watch for this run — do not write a
   fake price, and do not send an alert. Note the failure when posting the summary (Step 6).
 
@@ -51,13 +54,39 @@ Message format: "✈️ Fare drop: [label] is now $[current_price] (was $[last_p
 Substitute the watch's own `recipient` for RECIPIENT. Escape any double quotes in the
 message text for the shell.
 
-## Step 6 — Record this check and report
+## Step 6 — Record this check
 Regardless of whether an alert fired, append `{ "checked_at": <UTC ISO timestamp now>,
 "price": current_price, "cabin": <cabin from Step 2> }` to this watch's array in
 `flight-tracker/price-history.json` and write the file back. Do this even for the
-baseline-only first run.
+baseline-only first run. Do this for every watch BEFORE moving to Step 7, so the chart
+rebuild below always reads fresh data.
 
-After all watches are processed, if running interactively, give a one-line summary per
-watch (current price, change since last check, alert sent or not). If any watch's search
-failed this run, mention it. This runs unattended most of the time — there is no chat to
-post to when launchd fires it, so this summary is for the log file / a manual test run.
+## Step 7 — Regenerate and republish the chart page
+`flight-tracker/index.html` embeds its own data in a `<script>` block as a `HISTORY` object
+(one entry per watch id, each `{ label, color, cabinCurrent, points: [{t, p}, ...] }`),
+plus an `ALT_PRICE` map and a `ROUTE_LABEL` map. All the layout/chart-drawing JS in that
+file is generic — it re-derives axes, the line, dots, end-labels, and the table purely from
+whatever is in `HISTORY`, so you only need to edit the embedded data, never the drawing code:
+- For each watch, set `HISTORY[id].points` to the FULL array now in
+  `flight-tracker/price-history.json` for that id (not just today's point — the chart plots
+  the whole history every time).
+- Update `HISTORY[id].cabinCurrent` to today's `cabin` from Step 2, and `ALT_PRICE[id]` to
+  today's `alt_price`.
+- `ROUTE_LABEL` only needs an entry when a new watch is added (it holds the human-readable
+  departure/return date strings shown on the boarding-pass card) — leave existing entries
+  alone.
+- Do not touch the `<style>`, the SVG chart-building script, or any layout markup — only the
+  `HISTORY` / `ALT_PRICE` / `ROUTE_LABEL` data at the top of the `<script>` block at the
+  bottom of the file.
+- Write the file back to `flight-tracker/index.html`.
+
+Read the saved URL from `flight-tracker/ARTIFACT_URL.txt`. Call the Artifact tool with
+`file_path` set to `flight-tracker/index.html` and `url` set to that saved URL, so it
+redeploys in place. (Only omit `url` if that file is missing/empty — a first-time publish —
+in which case save the newly returned URL back to that file.)
+
+## Step 8 — Report
+If running interactively, give a one-line summary per watch (current price, change since
+last check, alert sent or not) plus the dashboard link. If any watch's search failed this
+run, mention it. This runs unattended most of the time — there is no chat to post to when
+launchd fires it, so this summary is for the log file / a manual test run.

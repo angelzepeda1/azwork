@@ -11,7 +11,7 @@
     <string>-p</string>
     <string>Read and follow every step in Scheduled/flight-price-watch/SKILL.md at the root of this repo, in order.</string>
     <string>--allowedTools</string>
-    <string>Read Write Edit Bash mcp__claude_ai_Otto_Travel__read_skill mcp__claude_ai_Otto_Travel__search_flights mcp__claude_ai_Otto_Travel__task_status mcp__claude_ai_Otto_Travel__query_flights</string>
+    <string>Read Write Edit Bash Artifact mcp__claude_ai_Otto_Travel__read_skill mcp__claude_ai_Otto_Travel__search_flights mcp__claude_ai_Otto_Travel__task_status mcp__claude_ai_Otto_Travel__query_flights</string>
     <string>--permission-mode</string>
     <string>acceptEdits</string>
   </array>
