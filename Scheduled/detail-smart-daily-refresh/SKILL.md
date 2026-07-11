@@ -66,8 +66,7 @@ Update the WEEKS array entry for the current week (the last entry) with all fres
 - appointments array (one entry per accepted booking, CLIENT NAME FIRST, PAID/ACCEPTED set per rule above)
 - reviews object: { count: newReviewsThisWeek, rating: lastKnownRating, total: lastKnownTotal + newReviewsThisWeek, names: newReviewerNames }
 Also update weekLabel, shortLabel, and the last-updated timestamp at the bottom.
-Write the updated HTML back to `dashboards/detail-smart/index.html` in place (this is a git-tracked file —
-committing it is optional but keeps history).
+Write the updated HTML back to `dashboards/detail-smart/index.html` in place.
 
 ## Step 5 — Republish the Artifact
 Read the saved URL from `dashboards/detail-smart/ARTIFACT_URL.txt`. Call the Artifact tool with
@@ -85,3 +84,9 @@ Post:
 
 [Open Dashboard](<the saved artifact URL>)"
 If any metric is zero, still post it. If there are unpaid/quoted invoices, failed payments, or notable cancellations worth attention, add a one-line "Heads up:" note after the bullets.
+
+## Step 7 — Commit and push
+This skill runs in a fresh clone each time, so the local machine only sees today's numbers if they're
+pushed. `git add dashboards/detail-smart/index.html dashboards/detail-smart/ARTIFACT_URL.txt`, commit with
+a short message like "Daily refresh: [weekLabel]", and push to `origin main`. If the push is rejected
+(diverged history), pull --rebase once and retry; do not force-push.
