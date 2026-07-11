@@ -24,8 +24,6 @@ For each watch:
 - This is the cheapest bookable fare regardless of cabin (including Basic Economy), matching
   what most fare trackers quote as "the price." Record it as `current_price` and note its
   `cabin` value.
-- Also run the same query with `AND fo.cabin != 'BASIC'` to get the cheapest standard-Economy
-  fare — record as `alt_price` (used only for display on the dashboard, not for alert math).
 - If the search errors or returns nothing, skip this watch for this run — do not write a
   fake price, and do not send an alert. Note the failure when posting the summary (Step 6).
 
@@ -63,21 +61,22 @@ rebuild below always reads fresh data.
 
 ## Step 7 — Regenerate and republish the chart page
 `flight-tracker/index.html` embeds its own data in a `<script>` block as a `HISTORY` object
-(one entry per watch id, each `{ label, color, cabinCurrent, points: [{t, p}, ...] }`),
-plus an `ALT_PRICE` map and a `ROUTE_LABEL` map. All the layout/chart-drawing JS in that
-file is generic — it re-derives axes, the line, dots, end-labels, and the table purely from
-whatever is in `HISTORY`, so you only need to edit the embedded data, never the drawing code:
+(one entry per watch id, each `{ label, color, cabinCurrent, points: [{t, p}, ...] }`) plus a
+`ROUTE_LABEL` map. All the layout/chart-drawing JS in that file is generic — it re-derives
+axes, the line, dots, end-labels, the per-window delta badge, and the table purely from
+whatever is in `HISTORY`, so you only need to edit the embedded data, never the drawing code.
+Each card's delta badge (colored "since last check" indicator) compares a watch only against
+its OWN previous point — there is deliberately no cross-watch comparison anywhere on this
+page, so don't add one back in.
 - For each watch, set `HISTORY[id].points` to the FULL array now in
   `flight-tracker/price-history.json` for that id (not just today's point — the chart plots
   the whole history every time).
-- Update `HISTORY[id].cabinCurrent` to today's `cabin` from Step 2, and `ALT_PRICE[id]` to
-  today's `alt_price`.
+- Update `HISTORY[id].cabinCurrent` to today's `cabin` from Step 2.
 - `ROUTE_LABEL` only needs an entry when a new watch is added (it holds the human-readable
   departure/return date strings shown on the boarding-pass card) — leave existing entries
   alone.
 - Do not touch the `<style>`, the SVG chart-building script, or any layout markup — only the
-  `HISTORY` / `ALT_PRICE` / `ROUTE_LABEL` data at the top of the `<script>` block at the
-  bottom of the file.
+  `HISTORY` / `ROUTE_LABEL` data at the top of the `<script>` block at the bottom of the file.
 - Write the file back to `flight-tracker/index.html`.
 
 Read the saved URL from `flight-tracker/ARTIFACT_URL.txt`. Call the Artifact tool with

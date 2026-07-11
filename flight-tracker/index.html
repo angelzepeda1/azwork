@@ -119,8 +119,14 @@
     font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
   }
   .price-main .cabin-note { font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.06em; }
-  .price-alt { font-size: 12.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
-  .price-alt b { color: var(--ink); font-weight: 600; }
+
+  .delta {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
+    padding: 4px 9px; border-radius: 100px; width: fit-content; font-variant-numeric: tabular-nums;
+  }
+  .delta.down { background: var(--good-bg); color: var(--good); }
+  .delta.up { background: var(--warn-bg); color: var(--warn); }
+  .delta.flat, .delta.baseline { background: var(--card-border); color: var(--ink-soft); }
 
   .row-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 2px; }
   .pill {
@@ -130,17 +136,6 @@
   .pill.tracking { background: var(--amber-soft); color: var(--amber); }
   .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
   .threshold { font-size: 11px; color: var(--ink-soft); font-family: ui-monospace, "SF Mono", Menlo, monospace; }
-
-  .compare {
-    display: flex; align-items: center; gap: 14px; padding: 16px 20px;
-    border: 1px solid var(--card-border); border-radius: 4px; background: var(--card); font-size: 13.5px;
-  }
-  .compare .badge {
-    flex-shrink: 0; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-weight: 700; font-size: 13px;
-    padding: 5px 10px; border-radius: 4px; background: var(--warn-bg); color: var(--warn); font-variant-numeric: tabular-nums;
-  }
-  .compare p { margin: 0; color: var(--ink-soft); }
-  .compare p b { color: var(--ink); font-weight: 600; }
 
   /* --- Price history chart --- */
   .history {
@@ -192,8 +187,8 @@
 </style>
 
 <div class="kicker">Fare Watch — Personal</div>
-<h1>SFO ⇄ San Diego, two windows compared</h1>
-<p class="sub">Cheapest bookable round-trip fare pulled live via Otto Travel for each date option under consideration. Both are on a 10%-drop watch, checked every 6 hours.</p>
+<h1>SFO ⇄ San Diego — fare watch</h1>
+<p class="sub">Cheapest bookable round-trip fare pulled live via Otto Travel, tracked independently per trip window. Each is on a 10%-drop watch, checked every 6 hours.</p>
 <div class="meta-row">
   <span>Last checked <b id="meta-updated">—</b></span>
   <span>Passengers <b>1</b></span>
@@ -201,8 +196,6 @@
 </div>
 
 <div class="cards" id="pass-cards"></div>
-
-<div class="compare" id="compare-bar"></div>
 
 <div class="history">
   <div class="history-head">
@@ -244,7 +237,6 @@ const HISTORY = {
     points: [{ t: "2026-07-11T22:50:52Z", p: 383.60 }]
   }
 };
-const ALT_PRICE = { "sfo-san-sep25-27": 246.81, "sfo-san-nov27-29": 448.61 };
 const ROUTE_LABEL = { "sfo-san-sep25-27": ["Fri, Sep 25", "Sun, Sep 27"], "sfo-san-nov27-29": ["Fri, Nov 27", "Sun, Nov 29"] };
 const THRESHOLD = "alert >10% drop";
 
@@ -253,6 +245,16 @@ function fmtDateShort(iso) {
   const d = new Date(iso);
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + " " +
          d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+}
+function deltaBadge(points) {
+  if (points.length < 2) return { cls: "baseline", text: "Baseline — first check" };
+  const cur = points[points.length - 1].p, prev = points[points.length - 2].p;
+  const diff = cur - prev;
+  if (diff === 0) return { cls: "flat", text: "— unchanged since last check" };
+  const pct = Math.abs(diff / prev * 100).toFixed(1);
+  return diff < 0
+    ? { cls: "down", text: `▼ ${fmtUSD(Math.abs(diff))} (${pct}%) since last check` }
+    : { cls: "up", text: `▲ ${fmtUSD(diff)} (${pct}%) since last check` };
 }
 
 // -- Render boarding-pass cards --
@@ -263,6 +265,7 @@ for (const id of Object.keys(HISTORY)) {
   const last = h.points[h.points.length - 1];
   if (!latestCheck || new Date(last.t) > new Date(latestCheck)) latestCheck = last.t;
   const [d1, d2] = ROUTE_LABEL[id];
+  const delta = deltaBadge(h.points);
   cardsEl.insertAdjacentHTML("beforeend", `
     <div class="pass">
       <div class="pass-stub">
@@ -272,26 +275,12 @@ for (const id of Object.keys(HISTORY)) {
       <div class="perf"></div>
       <div class="pass-price">
         <div class="price-main"><span class="amt">${fmtUSD(last.p)}</span><span class="cabin-note">${h.cabinCurrent}</span></div>
-        <div class="price-alt">Standard Economy: <b>${fmtUSD(ALT_PRICE[id])}</b></div>
+        <span class="delta ${delta.cls}">${delta.text}</span>
         <div class="row-bottom"><span class="pill tracking">Tracking</span><span class="threshold">${THRESHOLD}</span></div>
       </div>
     </div>`);
 }
 document.getElementById("meta-updated").textContent = latestCheck ? fmtDateShort(latestCheck) + " PT" : "—";
-
-// -- Compare bar (Sep vs Nov, cheapest tier) --
-(function () {
-  const ids = Object.keys(HISTORY);
-  if (ids.length === 2) {
-    const [a, b] = ids.map(id => HISTORY[id].points[HISTORY[id].points.length - 1].p);
-    const diff = Math.abs(a - b);
-    const pct = Math.round((diff / Math.min(a, b)) * 100);
-    const cheaper = a < b ? HISTORY[ids[0]].label : HISTORY[ids[1]].label;
-    document.getElementById("compare-bar").innerHTML = `
-      <span class="badge">+${fmtUSD(diff)}</span>
-      <p>The pricier window currently runs <b>${pct}% more</b> than ${cheaper} at the cheapest fare tier.</p>`;
-  }
-})();
 
 // -- Chart --
 const W = 860, H = 220, PAD_L = 54, PAD_R = 16, PAD_T = 16, PAD_B = 28;
