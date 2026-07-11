@@ -1,0 +1,481 @@
+<!DOCTYPE html><script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Detail Smart Dashboard",
+  "schemaVersion": 1,
+  "description": "Detail Smart weekly dashboard — pulls live Square sales data and Quo call data on load. Shows weekly revenue, avg order value, order breakdown, total/inbound/outbound/missed calls, and avg call duration. Google Reviews is a placeholder pending connector setup.",
+  "mcpTools": [],
+  "mcpServerNames": []
+}
+</script>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Detail Smart Dashboard</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f7f8fa; color: #1a1a1a; padding: 24px; min-height: 100vh; }
+  header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+  header h1 { font-size: 20px; font-weight: 700; color: #111; margin-bottom: 6px; }
+  .week-nav { display: flex; align-items: center; gap: 8px; }
+  .nav-btn { background: #f0f0f0; border: 1px solid #e0e0e0; border-radius: 6px; width: 30px; height: 30px; font-size: 15px; cursor: pointer; color: #444; display: flex; align-items: center; justify-content: center; transition: background .15s; flex-shrink: 0; }
+  .nav-btn:hover:not(:disabled) { background: #e2e2e2; }
+  .nav-btn:disabled { opacity: 0.25; cursor: default; }
+  .subtitle { font-size: 13px; color: #555; font-weight: 500; }
+  .week-indicator { font-size: 11px; color: #bbb; margin-top: 2px; }
+  .refresh-btn { background: #111; color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-size: 13px; cursor: pointer; font-weight: 500; }
+  .refresh-btn:hover { background: #333; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .card { background: #fff; border-radius: 14px; padding: 20px 22px; border: 1px solid #eee; }
+  .card .label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: #999; margin-bottom: 10px; }
+  .card .value { font-size: 32px; font-weight: 700; color: #111; line-height: 1; }
+  .card .sub { font-size: 13px; color: #aaa; margin-top: 6px; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; margin-top: 8px; }
+  .green { background: #e6f9f0; color: #1a8a4a; }
+  .amber { background: #fff8e1; color: #b07800; }
+  .red   { background: #fdecea; color: #b71c1c; }
+  .section { background: #fff; border-radius: 14px; border: 1px solid #eee; overflow: hidden; margin-bottom: 16px; }
+  .section-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 22px 12px; border-bottom: 1px solid #f2f2f2; }
+  .section-header h2 { font-size: 13px; font-weight: 600; color: #555; }
+  .tag { font-size: 11px; color: #bbb; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { text-align: left; padding: 9px 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: #bbb; background: #fafafa; }
+  tbody tr { border-top: 1px solid #f4f4f4; }
+  tbody tr:hover { background: #fafafa; }
+  tbody td { padding: 11px 20px; color: #333; vertical-align: top; }
+  td.right { text-align: right; font-weight: 600; color: #111; }
+  .note { font-size: 12px; color: #aaa; margin-top: 3px; line-height: 1.4; }
+  .chip { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+  .chip-g { background: #e6f9f0; color: #1a8a4a; }
+  .chip-r { background: #fdecea; color: #b71c1c; }
+  .chip-b { background: #e8f0fe; color: #1a56db; }
+  .stat-row { display: flex; border-top: 1px solid #f2f2f2; }
+  .stat-cell { flex: 1; padding: 15px 20px; border-right: 1px solid #f2f2f2; text-align: center; }
+  .stat-cell:last-child { border-right: none; }
+  .sv { font-size: 22px; font-weight: 700; color: #111; }
+  .sl { font-size: 11px; color: #aaa; margin-top: 3px; }
+  .connect-note { background: #fffbea; border: 1px dashed #f0cc60; border-radius: 10px; padding: 13px 18px; font-size: 13px; color: #7a6000; line-height: 1.6; }
+  .na-note { background: #f7f8fa; border: 1px dashed #ddd; border-radius: 10px; padding: 13px 18px; font-size: 13px; color: #aaa; text-align: center; }
+  .last-updated { font-size: 11px; color: #ccc; text-align: right; margin-top: 14px; }
+  .empty-row td { color: #bbb; font-style: italic; text-align: center; padding: 20px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Detail Smart</h1>
+    <div class="week-nav">
+      <button class="nav-btn" id="prevBtn" onclick="navigate(-1)">&#8592;</button>
+      <div>
+        <div class="subtitle" id="weekLabel"></div>
+        <div class="week-indicator" id="weekIndicator"></div>
+      </div>
+      <button class="nav-btn" id="nextBtn" onclick="navigate(1)">&#8594;</button>
+    </div>
+  </div>
+  <button class="refresh-btn" id="refreshBtn" onclick="runRefresh()">&#8635; Refresh</button>
+</header>
+
+<div class="grid">
+  <div class="card">
+    <div class="label">Weekly Revenue</div>
+    <div class="value" id="revenue">—</div>
+    <div class="sub" id="revSub"></div>
+    <span class="badge green" id="revBadge"></span>
+  </div>
+  <div class="card">
+    <div class="label">Bookings</div>
+    <div class="value" id="bookings">—</div>
+    <div class="sub" id="bookSub"></div>
+    <span class="badge green" id="bookBadge"></span>
+  </div>
+  <div class="card">
+    <div class="label">Incoming Calls</div>
+    <div class="value" id="callsIn">—</div>
+    <div class="sub" id="callsSub"></div>
+    <span class="badge" id="callsBadge"></span>
+  </div>
+  <div class="card">
+    <div class="label">Google Reviews</div>
+    <div class="value" id="reviewCount">0</div>
+    <div class="sub" id="reviewSub"></div>
+    <span class="badge green" id="reviewBadge"></span>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <h2>Appointments This Week</h2>
+    <span class="tag" id="apptTag">Square Bookings</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Date &amp; Time</th>
+        <th>Notes</th>
+        <th>Status</th>
+        <th style="text-align:right">Revenue</th>
+      </tr>
+    </thead>
+    <tbody id="apptBody"></tbody>
+  </table>
+</div>
+
+<div class="section" id="reviewsSection">
+  <div class="section-header">
+    <h2>Google Reviews This Week</h2>
+    <span class="tag" id="reviewsTag"></span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Reviewer</th>
+        <th>Rating</th>
+        <th style="text-align:right">Overall</th>
+      </tr>
+    </thead>
+    <tbody id="reviewsBody"></tbody>
+  </table>
+</div>
+
+<div class="section" id="quoSection">
+  <div class="section-header">
+    <h2>Call Breakdown — Quo WestLA</h2>
+    <span class="tag" id="quoTag"></span>
+  </div>
+  <div class="stat-row" id="quoStats"></div>
+</div>
+
+<div class="connect-note">
+  ✅ <strong>Square:</strong> refreshed successfully this run — 5 accepted bookings, $683.47 collected across 3 paid jobs (avg $227.82/job) for Jul 6–12.<br>
+  📞 <strong>Quo calls:</strong> refreshed successfully this run — 19 calls so far this week: 14 inbound, 5 outbound, 2 missed, avg 2m 37s.<br>
+  ⭐ <strong>Google Reviews:</strong> 1 new review this week (Prism). Overall total: 114.<br>
+  Hit &#8635; Refresh above to pull the latest numbers again.
+</div>
+<div class="last-updated" id="lastUpdated">Last updated: Jul 10, 2026 · 4:06 AM PT (Square, Quo call data, and Google Reviews all refreshed this run)</div>
+
+<script>
+const WEEKS = [
+  {
+    label: "Apr 27 – May 3, 2026",
+    shortLabel: "Apr 27–May 3",
+    revenue: "$1,809.96",
+    orders: 6,
+    avgPerJob: "$301.66",
+    bookings: 6,
+    calls: null,
+    reviews: { count: 0, rating: "4.9", total: 111, names: [] },
+    appointments: [
+      { date: "Apr 27", time: "10:50 AM", notes: "Mahed Islam · Full Detail · Sedan", status: "PAID", chip: "chip-b", revenue: "$259.99" },
+      { date: "Apr 27", time: "4:12 PM",  notes: "Tracey Stroh · Full Detail · SUV · +$50 tip", status: "PAID", chip: "chip-b", revenue: "$329.99" },
+      { date: "May 1",  time: "6:47 PM",  notes: "Paul Grace · Full Detail · Sedan + Ozone · +$30 tip", status: "PAID", chip: "chip-b", revenue: "$339.99" },
+      { date: "May 2",  time: "10:49 AM", notes: "Gwendolyn Dryer · Full Detail · Sedan · +$60 tip", status: "PAID", chip: "chip-b", revenue: "$320.00" },
+      { date: "May 2",  time: "11:55 AM", notes: "Mclean (Coastline Academy) · Commercial Package · +$10 tip", status: "PAID", chip: "chip-b", revenue: "$260.00" },
+      { date: "May 2",  time: "3:06 PM",  notes: "Brenda Marzett · Full Detail · SUV · +$20 tip", status: "PAID", chip: "chip-b", revenue: "$299.99" }
+    ],
+    apptTag: "Square Orders",
+    quoStats: null
+  },
+  {
+    label: "May 4 – May 10, 2026",
+    shortLabel: "May 4–10",
+    revenue: "$234.99",
+    orders: 1,
+    avgPerJob: "$234.99",
+    bookings: 1,
+    calls: { total: 54, inbound: 31, outbound: 23, missed: 4, avg: "2m 5s" },
+    reviews: { count: 0, rating: "4.9", total: 111, names: [] },
+    appointments: [
+      { date: "May 8", time: "12:39 PM", notes: "Sara Murphy · Interior Detail · SUV + Dog Hair add-on · +$25 tip", status: "PAID", chip: "chip-b", revenue: "$234.99" }
+    ],
+    apptTag: "Square Orders",
+    quoStats: { total: 54, inbound: 31, outbound: 23, missed: 4, avg: "2m 5s" }
+  },
+  {
+    label: "May 11 – May 17, 2026",
+    shortLabel: "May 11–17",
+    revenue: "$929.96",
+    orders: 4,
+    avgPerJob: "$232.49",
+    bookings: 4,
+    calls: { total: 43, inbound: 24, outbound: 19, missed: 1, avg: "2m 11s" },
+    reviews: { count: 0, rating: "4.9", total: 111, names: [] },
+    appointments: [
+      { date: "May 13", time: "4:00 PM",  notes: "Maju Magtaz · Interior Detail + Ozone · Smell · Commercial garage P3", status: "ACCEPTED", chip: "chip-g", revenue: "$229.99" },
+      { date: "May 15", time: "8:30 AM",  notes: "Jonathan Ro · Full Detail · BMW 335i 2013, silver/gray", status: "ACCEPTED", chip: "chip-g", revenue: "$259.99" },
+      { date: "May 16", time: "10:30 AM", notes: "Krista Tabuenca · Full Detail · Jeep Rubicon · Detailer: Torcel", status: "ACCEPTED", chip: "chip-g", revenue: "$279.99" },
+      { date: "May 16", time: "10:30 AM", notes: "Anita Nasiri · Interior Detail · Tesla 3 · Detailer: Abdul", status: "ACCEPTED", chip: "chip-g", revenue: "$159.99" }
+    ],
+    apptTag: "Square Bookings",
+    quoStats: { total: 43, inbound: 24, outbound: 19, missed: 1, avg: "2m 11s" }
+  },
+  {
+    label: "May 18 – May 24, 2026",
+    shortLabel: "May 18–24",
+    revenue: "$1,509.94",
+    orders: 6,
+    avgPerJob: "$251.66",
+    bookings: 7,
+    calls: { total: 7, inbound: 5, outbound: 2, missed: 1, avg: "1m 58s" },
+    reviews: { count: 1, rating: "4.9", total: 112, names: ["makrinee"] },
+    appointments: [
+      { date: "May 18", time: "3:00 PM",  notes: "Samuel Pham · Full Detail + Additional Interior Care · Civic Sedan · throw up · 3324 Castle Heights Ave, LA", status: "PAID", chip: "chip-b", revenue: "$359.99" },
+      { date: "May 19", time: "2:00 PM",  notes: "Maka Buadze · Interior Detail (SUV) + Additional Interior Care · Chevy Tahoe · Molds · 1081 Amoroso Pl, Venice · paid cash", status: "PAID", chip: "chip-b", revenue: "$229.99" },
+      { date: "May 20", time: "9:00 AM",  notes: "Noemi Coute · Interior Detail (Sedan) + Dog Hair · Big dog · 1739 Midvale Ave, LA", status: "PAID", chip: "chip-b", revenue: "$219.99" },
+      { date: "May 20", time: "4:30 PM",  notes: "Jason Lemer · Full Detail (Sedan) · 2018 Camry · Detailer: Abdul · 2372 Kelton Ave, LA · paid cash", status: "PAID", chip: "chip-b", revenue: "$259.99" },
+      { date: "May 21", time: "1:30 PM",  notes: "John Meier · Interior Detail (Sedan) · Porsche 911 · Detailer: Abdul · 953 6th St, Santa Monica", status: "ACCEPTED", chip: "chip-g", revenue: "~$139.99" },
+      { date: "May 22", time: "4:00 PM",  notes: "Bryan Castanos · Full Detail (Sedan) · BMW sedan, sticky mats · Detailer: Abdul · 10608 W Santa Monica Blvd, LA · paid cash", status: "PAID", chip: "chip-b", revenue: "$259.99" },
+      { date: "May 22", time: "7:45 PM",  notes: "Brian Kim · Interior Detail (Van/SUV) · van · food mess + smell · 3841 Shannon Rd, LA · Detailer: Abdul · paid via Venmo", status: "PAID", chip: "chip-b", revenue: "$179.99" }
+    ],
+    apptTag: "Square Bookings",
+    quoStats: { total: 7, inbound: 5, outbound: 2, missed: 1, avg: "1m 58s" }
+  },
+  {
+    label: "May 25 – May 31, 2026",
+    shortLabel: "May 25–31",
+    revenue: "$1,219.96",
+    orders: 4,
+    avgPerJob: "$304.99",
+    bookings: 4,
+    calls: { total: 25, inbound: 16, outbound: 9, missed: 3, avg: "1m 16s" },
+    reviews: { count: 0, rating: "4.9", total: 112, names: [] },
+    appointments: [
+      { date: "May 25", time: "6:00 PM",  notes: "Arlen Papazian · Full Detail (Van/SUV) · Ioniq 5 · 1970 S Beverly Glen Blvd, LA 90025 · Detailer: Abdul · +$40 tip", status: "PAID", chip: "chip-b", revenue: "$319.99" },
+      { date: "May 29", time: "5:30 PM",  notes: "Rick H · Full Detail (Sedan) + Heavy Hot Water Extraction · Prius · stains on seats · 974 S Gramercy Pl, LA 90019 · Detailer: Abdul", status: "PAID", chip: "chip-b", revenue: "$309.99" },
+      { date: "May 31", time: "11:30 AM", notes: "Giovanni De Geronimo · Full Detail (Sedan) · Tesla Y · park on rooftop · 1015 Hilgard Ave Unit 2, LA 90024 · Detailer: Abdul · +$40 tip", status: "PAID", chip: "chip-b", revenue: "$299.99" },
+      { date: "May 31", time: "7:00 PM",  notes: "Eric Ji · Full Detail (Sedan) · 2nd-hand sedan · 12000 Rhode Island Ave, LA 90025 · Detailer: Abdul · +$30 tip", status: "PAID", chip: "chip-b", revenue: "$289.99" }
+    ],
+    apptTag: "Square Bookings",
+    quoStats: { total: 25, inbound: 16, outbound: 9, missed: 3, avg: "1m 16s" }
+  },
+  {
+    label: "Jun 1 – Jun 7, 2026",
+    shortLabel: "Jun 1–7",
+    revenue: "$0",
+    orders: 0,
+    avgPerJob: "—",
+    bookings: 0,
+    calls: { total: 22, inbound: 16, outbound: 6, missed: 1, avg: "0m 57s" },
+    reviews: { count: 0, rating: "4.9", total: 112, names: [] },
+    appointments: [],
+    apptTag: "Square Bookings",
+    quoStats: { total: 22, inbound: 16, outbound: 6, missed: 1, avg: "0m 57s" }
+  },
+  {
+    label: "Jun 8 – Jun 14, 2026",
+    shortLabel: "Jun 8–14",
+    revenue: "$3,049.89",
+    orders: 11,
+    avgPerJob: "$277.26",
+    bookings: 11,
+    calls: { total: 66, inbound: 34, outbound: 32, missed: 3, avg: "1m 22s" },
+    reviews: { count: 0, rating: "4.9", total: 112, names: [] },
+    appointments: [
+      { date: "Jun 10", time: "12:00 PM", notes: "Roshan Qureshi · Full Detail (Van / Trucks / SUV) · Honda Odyssey · 10409 Almayo Ave Apt 6, LA 90064 · Detailer: Jotham", status: "PAID", chip: "chip-b", revenue: "$339.99" },
+      { date: "Jun 10", time: "5:30 PM",  notes: "Mandy Miller · Interior Detail (Sedan / Coupe) · needs vacuum, dust + food crumbs · 10333 Northvale Road, LA 90064 · Detailer: Aaron", status: "PAID", chip: "chip-b", revenue: "$159.99" },
+      { date: "Jun 11", time: "10:30 AM", notes: "Andres Orio Gonzalez · Full Detail (Van / Trucks / SUV) · VW Taos · deep interior clean · 11811 Venice Blvd, LA 90066 · Detailer: Angel", status: "PAID", chip: "chip-b", revenue: "$299.99" },
+      { date: "Jun 11", time: "1:30 PM",  notes: "Peter Giang · Full Detail (Large Vans / Trucks / SUVs) · 2659 Thorpe Ave, LA 90065 · Detailer: Aaron", status: "PAID", chip: "chip-b", revenue: "$299.99" },
+      { date: "Jun 11", time: "3:45 PM",  notes: "Peter Giang · Full Detail (Sedan / Coupe) · 2nd vehicle · 2659 Thorpe Ave, LA 90065 · Detailer: Aaron", status: "PAID", chip: "chip-b", revenue: "$319.99" },
+      { date: "Jun 12", time: "10:00 AM", notes: "Dylan McCoy · Exterior Detail (Vans / Trucks / SUV) · parked on Warner Ave · 10497 Wilshire Blvd, LA 90024 · Detailer: Angel", status: "PAID", chip: "chip-b", revenue: "$169.99" },
+      { date: "Jun 13", time: "7:00 AM",  notes: "Latosha Brooks · Full Detail (Sedan / Coupe) + Dog Hair · Dodge · dog hair · 2453 Barry Ave, LA 90064 · Detailer: Angel", status: "PAID", chip: "chip-b", revenue: "$289.99" },
+      { date: "Jun 13", time: "7:00 AM",  notes: "Latosha Brooks · Full Detail (Sedan / Coupe) + Dog Hair · Mercedes-Benz · dog hair · 2453 Barry Ave, LA 90064 · Detailer: Aaron", status: "PAID", chip: "chip-b", revenue: "$289.99" },
+      { date: "Jun 13", time: "1:00 PM",  notes: "Visakan Vairavamoorthy · Interior Detail (Van / Trucks / SUV) + Heavy Hot Water Extraction · puke on seats · 11727 Mayfield Ave, LA 90049 · Detailer: Abdul", status: "PAID", chip: "chip-b", revenue: "$239.99" },
+      { date: "Jun 14", time: "10:30 AM", notes: "Sunny Kwong · Full Detail (Sedan / Coupe) · 10751 Rose Avenue Apt 231, LA 90034 · Detailer: Angel", status: "PAID", chip: "chip-b", revenue: "$319.99" },
+      { date: "Jun 14", time: "3:10 PM",  notes: "Amanda Harvey · Full Detail (Sedan / Coupe) · Tesla Model S · no major issues · 10727 Wilshire Blvd, LA 90024 · Detailer: Abdul", status: "PAID", chip: "chip-b", revenue: "$319.99" }
+    ],
+    apptTag: "Square Bookings",
+    quoStats: { total: 66, inbound: 34, outbound: 32, missed: 3, avg: "1m 22s" }
+  },
+  {
+    label: "Jun 15 – Jun 21, 2026",
+    shortLabel: "Jun 15–21",
+    revenue: "$174.99",
+    orders: 1,
+    avgPerJob: "$174.99",
+    bookings: 3,
+    calls: { total: 39, inbound: 20, outbound: 19, missed: 2, avg: "2m 20s" },
+    reviews: { count: 0, rating: "4.9", total: 112, names: [] },
+    appointments: [
+      { date: "Jun 15", time: "2:00 PM",  notes: "Jeremy Levin · Interior Detail (Sedan / Coupe) · Prius · deep clean, shampoo carpets, fresh scent · 678 S Ardmore Ave, LA 90005", status: "PAID", chip: "chip-b", revenue: "$174.99" },
+      { date: "Jun 16", time: "2:30 PM",  notes: "Jeff Grossman · Paint Correction (Van / Trucks / SUVs) · BMW iX, dark graphite · swirls + superficial scratches · 1538 Roscomare Rd, LA 90077 · Detailer: Torcel", status: "ACCEPTED", chip: "chip-g", revenue: "~$599.00" },
+      { date: "Jun 16", time: "3:00 PM",  notes: "Christopher Salazar · Basic Wash + Clay Bar add-on · 401 S Spalding Dr Apt A, Beverly Hills 90212", status: "ACCEPTED", chip: "chip-g", revenue: "~$90.00" }
+    ],
+    apptTag: "Square Bookings",
+    quoStats: { total: 39, inbound: 20, outbound: 19, missed: 2, avg: "2m 20s" }
+  },
+  {
+    label: "Jun 22 – Jun 28, 2026",
+    shortLabel: "Jun 22–28",
+    revenue: "—",
+    orders: "—",
+    avgPerJob: "—",
+    bookings: "—",
+    calls: { total: 50, inbound: 27, outbound: 23, missed: 1, avg: "1m 43s" },
+    reviews: { count: 1, rating: "4.9", total: 113, names: ["Amy"] },
+    appointments: [],
+    apptTag: "Square Bookings (unavailable — needs re-auth)",
+    quoStats: { total: 50, inbound: 27, outbound: 23, missed: 1, avg: "1m 43s" }
+  },
+  {
+    label: "Jun 29 – Jul 5, 2026",
+    shortLabel: "Jun 29–Jul 5",
+    revenue: "—",
+    orders: "—",
+    avgPerJob: "—",
+    bookings: "—",
+    calls: { total: 36, inbound: 24, outbound: 12, missed: 1, avg: "1m 33s" },
+    reviews: { count: 0, rating: "4.9", total: 113, names: [] },
+    appointments: [],
+    apptTag: "Square Bookings (unavailable — needs re-auth)",
+    quoStats: { total: 36, inbound: 24, outbound: 12, missed: 1, avg: "1m 33s" }
+  },
+  {
+    label: "Jul 6 – Jul 12, 2026",
+    shortLabel: "Jul 6–12",
+    revenue: "$683.47",
+    orders: 3,
+    avgPerJob: "$227.82",
+    bookings: 5,
+    calls: { total: 19, inbound: 14, outbound: 5, missed: 2, avg: "2m 37s" },
+    reviews: { count: 1, rating: "4.9", total: 114, names: ["Prism"] },
+    appointments: [
+      { date: "Jul 6", time: "10:30 AM", notes: "McGowan Bella · Full Detail (Van / Trucks / SUV) · Toyota mini van · possible odor smell, confirm on site · 343 S Glenroy Ave, LA 90049 · Detailer: Angel", status: "ACCEPTED", chip: "chip-g", revenue: "~$279.99" },
+      { date: "Jul 6", time: "3:30 PM",  notes: "Yanet Marquez-Luna · Interior Detail (Sedan / Coupe) + Ozone Odor Removal · Tesla Model 3 · 10940 Wilshire Blvd, LA 90024 · Detailer: Jotham · +$40 tip", status: "PAID", chip: "chip-b", revenue: "$249.99" },
+      { date: "Jul 8", time: "10:00 AM", notes: "Jessica Valadez · Full Detail (Sedan / Coupe) + Clay Bar · Lexus UX 300h (red) · Angel's Friend (VIP), tree sap · 1597 Grandola Ave, LA 90041 · Detailer: Torcel · +$30 tip", status: "PAID", chip: "chip-b", revenue: "$293.49" },
+      { date: "Jul 8", time: "11:00 AM", notes: "Amanda Miller · Exterior Detail (Sedan / Coupe) · Black Lexus IS350 · 10866 Wilshire Blvd, LA 90024 · Detailer: Aaron", status: "PAID", chip: "chip-b", revenue: "$139.99" },
+      { date: "Jul 10", time: "10:00 AM", notes: "Nate Leishman · Full Detail (Van / Trucks / SUV) · 3427 Mentone Avenue #3, LA 90034 · Detailer: Aaron", status: "ACCEPTED", chip: "chip-g", revenue: "~$179.99" }
+    ],
+    apptTag: "Square Bookings",
+    quoStats: { total: 19, inbound: 14, outbound: 5, missed: 2, avg: "2m 37s" }
+  }
+];
+
+let current = 10; // Start on current week (Jul 6–12)
+
+function render(i) {
+  const w = WEEKS[i];
+
+  // Header
+  document.getElementById('weekLabel').textContent = w.label;
+  document.getElementById('weekIndicator').textContent = 'Week ' + (i + 1) + ' of ' + WEEKS.length;
+  document.getElementById('prevBtn').disabled = (i === 0);
+  document.getElementById('nextBtn').disabled = (i === WEEKS.length - 1);
+
+  // Revenue card
+  document.getElementById('revenue').textContent = w.revenue;
+  document.getElementById('revSub').textContent = w.orders + ' paid order' + (w.orders !== 1 ? 's' : '');
+  document.getElementById('revBadge').textContent = 'Avg ' + w.avgPerJob + ' / job';
+
+  // Bookings card
+  document.getElementById('bookings').textContent = w.bookings;
+  document.getElementById('bookSub').textContent = w.bookings + ' total this week';
+  document.getElementById('bookBadge').textContent = 'All confirmed';
+
+  // Calls card
+  if (w.calls) {
+    document.getElementById('callsIn').textContent = w.calls.inbound;
+    document.getElementById('callsSub').textContent = w.calls.total + ' total calls this week';
+    const badge = document.getElementById('callsBadge');
+    badge.textContent = w.calls.missed + ' missed';
+    badge.className = 'badge ' + (w.calls.missed <= 2 ? 'green' : 'amber');
+  } else {
+    document.getElementById('callsIn').textContent = '—';
+    document.getElementById('callsSub').textContent = 'Data not available';
+    const badge = document.getElementById('callsBadge');
+    badge.textContent = 'N/A';
+    badge.className = 'badge amber';
+  }
+
+  // Appointments table
+  document.getElementById('apptTag').textContent = w.apptTag;
+  const tbody = document.getElementById('apptBody');
+  if (w.appointments.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="4">No appointments this week</td></tr>';
+  } else {
+    tbody.innerHTML = w.appointments.map(a => `
+      <tr>
+        <td>${a.date}<br><span style="color:#aaa;font-size:12px">${a.time}</span></td>
+        <td><div class="note">${a.notes}</div></td>
+        <td><span class="chip ${a.chip}">${a.status}</span></td>
+        <td class="right" ${a.revenue === '—' ? 'style="color:#aaa"' : ''}>${a.revenue}</td>
+      </tr>`).join('');
+  }
+
+  // Reviews section (table)
+  const reviewsBody = document.getElementById('reviewsBody');
+  document.getElementById('reviewsTag').textContent = w.shortLabel;
+  if (w.reviews && w.reviews.names && w.reviews.names.length > 0) {
+    reviewsBody.innerHTML = w.reviews.names.map(name => `
+      <tr>
+        <td>${name}</td>
+        <td><span style="color:#f5a623;font-weight:600">★★★★★</span></td>
+        <td class="right" style="color:#1a8a4a;font-size:13px">+1 review</td>
+      </tr>`).join('');
+  } else {
+    reviewsBody.innerHTML = '<tr class="empty-row"><td colspan="3">No new reviews this week</td></tr>';
+  }
+
+  // Reviews card
+  if (w.reviews) {
+    const r = w.reviews;
+    document.getElementById('reviewCount').textContent = r.count;
+    document.getElementById('reviewSub').textContent = 'New review' + (r.count !== 1 ? 's' : '') + ' this week · ' + r.rating + ' ★ overall';
+    const rb = document.getElementById('reviewBadge');
+    rb.textContent = r.total + ' total' + (r.names && r.names.length ? ' · ' + r.names.join(', ') : '');
+    rb.className = 'badge ' + (r.count > 0 ? 'green' : 'amber');
+  } else {
+    document.getElementById('reviewCount').textContent = '—';
+    document.getElementById('reviewSub').textContent = 'No data';
+    const rb = document.getElementById('reviewBadge');
+    rb.textContent = 'N/A';
+    rb.className = 'badge amber';
+  }
+
+  // Quo call stats
+  const quoSection = document.getElementById('quoSection');
+  document.getElementById('quoTag').textContent = w.shortLabel;
+  if (w.quoStats) {
+    quoSection.style.display = '';
+    const s = w.quoStats;
+    document.getElementById('quoStats').innerHTML = `
+      <div class="stat-cell"><div class="sv">${s.total}</div><div class="sl">Total</div></div>
+      <div class="stat-cell"><div class="sv">${s.inbound}</div><div class="sl">Inbound</div></div>
+      <div class="stat-cell"><div class="sv">${s.outbound}</div><div class="sl">Outbound</div></div>
+      <div class="stat-cell"><div class="sv" style="color:#1a8a4a">${s.missed}</div><div class="sl">Missed</div></div>
+      <div class="stat-cell"><div class="sv">${s.avg}</div><div class="sl">Avg Duration</div></div>`;
+  } else {
+    quoSection.style.display = '';
+    document.getElementById('quoStats').innerHTML = `
+      <div class="stat-cell" style="flex:1;padding:20px;text-align:center;color:#bbb;font-size:13px">
+        Call data not available for this week
+      </div>`;
+  }
+}
+
+async function runRefresh() {
+  const btn = document.getElementById('refreshBtn');
+  btn.textContent = '⏳ Refreshing…';
+  btn.disabled = true;
+  try {
+    await window.cowork.runScheduledTask('detail-smart-daily-refresh');
+    btn.textContent = '✓ Updated';
+    setTimeout(() => { btn.textContent = '↻ Refresh'; btn.disabled = false; }, 3000);
+  } catch(e) {
+    btn.textContent = '↻ Refresh';
+    btn.disabled = false;
+    sendPrompt('Please refresh the Detail Smart dashboard — pull the latest Square orders, bookings, and Quo calls for this week (Jul 6–12) and update the artifact.');
+  }
+}
+
+function navigate(dir) {
+  current = Math.max(0, Math.min(WEEKS.length - 1, current + dir));
+  render(current);
+}
+
+render(current);
+</script>
+
+</body>
+</html>
