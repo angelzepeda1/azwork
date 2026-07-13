@@ -1,12 +1,14 @@
 ---
 name: flight-price-watch
-description: Checks every watched flight route/date in flight-tracker/watches.json and texts an alert when the price drops enough
+description: Checks every watched flight route/date in flight-tracker/watches.json and sends a Telegram alert when the price drops enough
 ---
 
 This runs as a CLOUD routine (not local launchd) — a fresh clone each time, no dependency on
-the owner's Mac being awake or charged. Alerts go out as an SMS via the Quo connector (a real
-send, unlike Gmail which can only create an unsent draft) rather than iMessage, since a cloud
-sandbox has no Messages.app.
+the owner's Mac being awake or charged. Alerts go out via a personal Telegram bot (see
+`notifications/telegram.json` and `notifications/README.md`) — a plain HTTPS call, so it
+works identically from the cloud or a local shell. Quo's SMS send was tried first but hit an
+unresolved "API key required or invalid" error; Gmail was ruled out because its connector can
+only create an unsent draft, not send.
 
 ## Step 1 — Load the watch list
 Read `flight-tracker/watches.json` (relative to this project root). Skip any watch with
@@ -43,13 +45,17 @@ Per the watch's `alert_type`:
 Only alert on a genuine drop (current_price < last_price) — a price increase or unchanged
 price is never an alert, no matter the math above.
 
-## Step 5 — Send the SMS alert (only if Step 4 says to)
-Call `mcp__claude_ai_Quo__send-message`:
-- `from`: `"+14242168638"` (the Detail Smart WestLA Quo inbox)
-- `to`: the watch's `recipient`, in E.164 format (e.g. `"+16195777882"`)
-- `content`: "✈️ Fare drop: [label] is now $[current_price] (was $[last_price], down [X]% /
-  $[Y]) — [alert_threshold]%/$ threshold hit. Route: [origin]→[destination], depart
-  [departure_date]" + return date if round-trip.
+## Step 5 — Send the Telegram alert (only if Step 4 says to)
+Read `notifications/telegram.json` for `bot_token` and `chat_id`. Use Bash:
+```
+curl -s -X POST "https://api.telegram.org/bot<BOT_TOKEN>/sendMessage" \
+  -d "chat_id=<CHAT_ID>" \
+  -d "text=MESSAGE_TEXT"
+```
+Message format: "✈️ Fare drop: [label] is now $[current_price] (was $[last_price], down
+[X]% / $[Y]) — [alert_threshold]%/$ threshold hit. Route: [origin]→[destination], depart
+[departure_date]" + return date if round-trip. Check the response has `"ok":true`; if not,
+note the failure in Step 9's report but do not treat it as fatal to the rest of the run.
 
 ## Step 6 — Record this check
 Regardless of whether an alert fired, append `{ "checked_at": <UTC ISO timestamp now>,

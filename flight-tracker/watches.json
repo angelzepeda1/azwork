@@ -10,7 +10,6 @@
     "cabin_class": "economy",
     "alert_type": "percent",
     "alert_threshold": 10,
-    "recipient": "+16195777882",
     "enabled": true
   },
   {
@@ -24,7 +23,6 @@
     "cabin_class": "economy",
     "alert_type": "percent",
     "alert_threshold": 10,
-    "recipient": "+16195777882",
     "enabled": true
   }
 ]
