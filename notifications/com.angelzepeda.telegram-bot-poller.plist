@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.angelzepeda.telegram-bot-poller</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Library/Frameworks/Python.framework/Versions/3.10/bin/python3</string>
+    <string>/Users/angelzepeda/Documents/Claude/Projects/Personal Tasks/notifications/telegram_poll.py</string>
+  </array>
+
+  <key>StartInterval</key>
+  <integer>60</integer>
+
+  <key>StandardOutPath</key>
+  <string>/Users/angelzepeda/Library/Logs/telegram-bot-poller.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/angelzepeda/Library/Logs/telegram-bot-poller.err.log</string>
+
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>
