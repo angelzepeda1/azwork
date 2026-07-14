@@ -152,6 +152,7 @@
   ✅ <strong>Square:</strong> refreshed successfully this run — 1 accepted booking (Ashkan Khalpari, Jul 14), $100.00 collected so far for Jul 13–19 (deposit on the $1,100 package; balance due on completion). One repeat-customer appointment was cancelled by the customer for Jul 14.<br>
   📞 <strong>Quo calls:</strong> refreshed successfully this run — 12 calls so far this week (8 inbound, 4 outbound, 0 missed, avg 1m 0s).<br>
   ⭐ <strong>Google Reviews:</strong> no new reviews this week. Overall total: 114.<br>
+  🛠️ <strong>Backlog:</strong> Apr 27 – May 3, 2026 call data recovered this run (95 calls) — that week's backlog gap is now closed.<br>
   Hit &#8635; Refresh above to pull the latest numbers again.
 </div>
 <div class="last-updated" id="lastUpdated">Last updated: Jul 14, 2026 · Morning refresh PT (Square, Quo call data, and Google Reviews all refreshed this run)</div>
@@ -165,7 +166,7 @@ const WEEKS = [
     orders: 6,
     avgPerJob: "$301.66",
     bookings: 6,
-    calls: null,
+    calls: { total: 95, inbound: 37, outbound: 58, missed: 3, avg: "1m 44s" },
     reviews: { count: 0, rating: "4.9", total: 111, names: [] },
     appointments: [
       { date: "Apr 27", time: "10:50 AM", notes: "Mahed Islam · Full Detail · Sedan", status: "PAID", chip: "chip-b", revenue: "$259.99" },
@@ -176,7 +177,7 @@ const WEEKS = [
       { date: "May 2",  time: "3:06 PM",  notes: "Brenda Marzett · Full Detail · SUV · +$20 tip", status: "PAID", chip: "chip-b", revenue: "$299.99" }
     ],
     apptTag: "Square Orders",
-    quoStats: null
+    quoStats: { total: 95, inbound: 37, outbound: 58, missed: 3, avg: "1m 44s" }
   },
   {
     label: "May 4 – May 10, 2026",
