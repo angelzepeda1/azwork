@@ -149,13 +149,13 @@
 </div>
 
 <div class="connect-note">
-  ✅ <strong>Square:</strong> refreshed successfully this run — 1 accepted booking (Ashkan Khalpari, Jul 14), $100.00 collected so far for Jul 13–19 (deposit on the $1,100 package; balance due on completion). No new orders or bookings since yesterday. One repeat-customer appointment remains cancelled by the customer for Jul 14.<br>
-  📞 <strong>Quo calls:</strong> refreshed successfully this run — 15 calls so far this week (11 inbound, 4 outbound, 0 missed, avg 0m 54s).<br>
+  ✅ <strong>Square:</strong> refreshed successfully this run — 1 accepted booking (Ashkan Khalpari, Jul 14), $1,500.00 collected for Jul 13–19 (deposit + balance paid in full for the Paint Correction & Ceramic Coating job). One repeat-customer appointment remains cancelled by the customer for Jul 14.<br>
+  📞 <strong>Quo calls:</strong> refreshed successfully this run — 19 calls so far this week (13 inbound, 6 outbound, 1 missed, avg 0m 55s).<br>
   ⭐ <strong>Google Reviews:</strong> no new reviews this week. Overall total: 114.<br>
   🛠️ <strong>Backlog:</strong> no incomplete historical weeks found this run.<br>
   Hit &#8635; Refresh above to pull the latest numbers again.
 </div>
-<div class="last-updated" id="lastUpdated">Last updated: Jul 15, 2026 · Morning refresh PT (Square, Quo call data, and Google Reviews all refreshed this run)</div>
+<div class="last-updated" id="lastUpdated">Last updated: Jul 16, 2026 · Morning refresh PT (Square, Quo call data, and Google Reviews all refreshed this run)</div>
 
 <script>
 const WEEKS = [
@@ -366,17 +366,17 @@ const WEEKS = [
   {
     label: "July 13 – July 19, 2026",
     shortLabel: "July 13–19",
-    revenue: "$100.00",
+    revenue: "$1,500.00",
     orders: 1,
-    avgPerJob: "$100.00",
+    avgPerJob: "$1,500.00",
     bookings: 1,
-    calls: { total: 15, inbound: 11, outbound: 4, missed: 0, avg: "0m 54s" },
+    calls: { total: 19, inbound: 13, outbound: 6, missed: 1, avg: "0m 55s" },
     reviews: { count: 0, rating: "4.9", total: 114, names: [] },
     appointments: [
-      { date: "Jul 14", time: "9:00 AM", notes: "Ashkan Khalpari · Full Detail + Ceramic Coating + Paint Correction package ($1,100 negotiated) · Mercedes sedan, scratches · 1015 Hilgard Ave Unit 2, LA 90024 · Detailer: Jose · $100 deposit paid, balance due on completion", status: "PAID", chip: "chip-b", revenue: "$100.00" }
+      { date: "Jul 14", time: "9:00 AM", notes: "Ashkan Khalpari · Paint Correction & Ceramic Coating · Mercedes sedan, scratches · 1015 Hilgard Ave Unit 2, LA 90024 · Detailer: Jose", status: "PAID", chip: "chip-b", revenue: "$1,500.00" }
     ],
     apptTag: "Square Bookings",
-    quoStats: { total: 15, inbound: 11, outbound: 4, missed: 0, avg: "0m 54s" }
+    quoStats: { total: 19, inbound: 13, outbound: 6, missed: 1, avg: "0m 55s" }
   }
 ];
 
@@ -493,7 +493,7 @@ async function runRefresh() {
   } catch(e) {
     btn.textContent = '↻ Refresh';
     btn.disabled = false;
-    sendPrompt('Please refresh the Detail Smart dashboard — pull the latest Square orders, bookings, and Quo calls for this week (Jul 6–12) and update the artifact.');
+    sendPrompt('Please refresh the Detail Smart dashboard — pull the latest Square orders, bookings, and Quo calls for this week (Jul 13–19) and update the artifact.');
   }
 }
 
