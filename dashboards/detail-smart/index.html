@@ -149,13 +149,13 @@
 </div>
 
 <div class="connect-note">
-  ✅ <strong>Square:</strong> refreshed successfully this run — 2 accepted bookings for Jul 13–19 (Ashkan Khalpari, Jul 14, PAID $1,500.00; Matthew Polito, Jul 19, ACCEPTED ~$259.99). $1,500.00 collected so far (deposit + balance paid in full for the Paint Correction & Ceramic Coating job). One repeat-customer appointment remains cancelled by the customer for Jul 14. No changes from yesterday's numbers.<br>
+  ✅ <strong>Square:</strong> refreshed successfully this run — new week (Jul 20–26) just started, 0 bookings and $0 collected so far.<br>
   📞 <strong>Quo calls:</strong> Quo connector not authorized this run — kept last known stats (19 calls, 13 inbound, 6 outbound, 1 missed, avg 0m 55s).<br>
   ⭐ <strong>Google Reviews:</strong> no new reviews this week. Overall total: 114.<br>
   🛠️ <strong>Backlog:</strong> no incomplete historical weeks found this run.<br>
   Hit &#8635; Refresh above to pull the latest numbers again.
 </div>
-<div class="last-updated" id="lastUpdated">Last updated: Jul 19, 2026 · Morning refresh PT (Square and Google Reviews refreshed this run; Quo call data kept from last known — connector needs re-authorization)</div>
+<div class="last-updated" id="lastUpdated">Last updated: Jul 20, 2026 · Morning refresh PT (Square and Google Reviews refreshed this run; Quo call data kept from last known — connector needs re-authorization)</div>
 
 <script>
 const WEEKS = [
@@ -378,10 +378,23 @@ const WEEKS = [
     ],
     apptTag: "Square Bookings",
     quoStats: { total: 19, inbound: 13, outbound: 6, missed: 1, avg: "0m 55s" }
+  },
+  {
+    label: "July 20 – July 26, 2026",
+    shortLabel: "July 20–26",
+    revenue: "$0",
+    orders: 0,
+    avgPerJob: "—",
+    bookings: 0,
+    calls: { total: 19, inbound: 13, outbound: 6, missed: 1, avg: "0m 55s" },
+    reviews: { count: 0, rating: "4.9", total: 114, names: [] },
+    appointments: [],
+    apptTag: "Square Bookings",
+    quoStats: { total: 19, inbound: 13, outbound: 6, missed: 1, avg: "0m 55s" }
   }
 ];
 
-let current = 11; // Start on current week (Jul 13–19)
+let current = 12; // Start on current week (Jul 20–26)
 
 function render(i) {
   const w = WEEKS[i];
@@ -494,7 +507,7 @@ async function runRefresh() {
   } catch(e) {
     btn.textContent = '↻ Refresh';
     btn.disabled = false;
-    sendPrompt('Please refresh the Detail Smart dashboard — pull the latest Square orders, bookings, and Quo calls for this week (Jul 13–19) and update the artifact.');
+    sendPrompt('Please refresh the Detail Smart dashboard — pull the latest Square orders, bookings, and Quo calls for this week (Jul 20–26) and update the artifact.');
   }
 }
 
