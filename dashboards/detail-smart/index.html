@@ -149,13 +149,13 @@
 </div>
 
 <div class="connect-note">
-  ✅ <strong>Square:</strong> refreshed successfully this run — new week (Jul 20–26) just started, 0 bookings and $0 collected so far.<br>
+  ✅ <strong>Square:</strong> refreshed successfully this run — 1 booking (Patty Shales, 2 vehicles) this week, $0 collected so far (unpaid/quoted).<br>
   📞 <strong>Quo calls:</strong> Quo connector not authorized this run — kept last known stats (19 calls, 13 inbound, 6 outbound, 1 missed, avg 0m 55s).<br>
   ⭐ <strong>Google Reviews:</strong> no new reviews this week. Overall total: 114.<br>
   🛠️ <strong>Backlog:</strong> no incomplete historical weeks found this run.<br>
   Hit &#8635; Refresh above to pull the latest numbers again.
 </div>
-<div class="last-updated" id="lastUpdated">Last updated: Jul 20, 2026 · Morning refresh PT (Square and Google Reviews refreshed this run; Quo call data kept from last known — connector needs re-authorization)</div>
+<div class="last-updated" id="lastUpdated">Last updated: Jul 21, 2026 · Morning refresh PT (Square and Google Reviews refreshed this run; Quo call data kept from last known — connector needs re-authorization)</div>
 
 <script>
 const WEEKS = [
@@ -385,10 +385,12 @@ const WEEKS = [
     revenue: "$0",
     orders: 0,
     avgPerJob: "—",
-    bookings: 0,
+    bookings: 1,
     calls: { total: 19, inbound: 13, outbound: 6, missed: 1, avg: "0m 55s" },
     reviews: { count: 0, rating: "4.9", total: 114, names: [] },
-    appointments: [],
+    appointments: [
+      { date: "Jul 21", time: "8:00 AM", notes: "Patty Shales · Full Detail (Van / Trucks / SUV) · 2 vehicles: BMW X5 & Audi W5 · 11339 Thurston Pl, LA 90049 · Detailer: Abdul", status: "ACCEPTED", chip: "chip-g", revenue: "~$559.98" }
+    ],
     apptTag: "Square Bookings",
     quoStats: { total: 19, inbound: 13, outbound: 6, missed: 1, avg: "0m 55s" }
   }
