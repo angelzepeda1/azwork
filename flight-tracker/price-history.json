@@ -4,7 +4,7 @@
       "checked_at": "2026-07-11T22:46:20Z",
       "price": 176.81,
       "cabin": "BASIC",
-      "note": "Baseline check — cheapest bookable round-trip fare (Basic Economy). Cheapest standard Economy fare same day was $246.81."
+      "note": "Baseline check \u2014 cheapest bookable round-trip fare (Basic Economy). Cheapest standard Economy fare same day was $246.81."
     },
     {
       "checked_at": "2026-07-12T00:13:26Z",
@@ -225,18 +225,23 @@
       "checked_at": "2026-07-22T18:16:00Z",
       "price": 156.79,
       "cabin": "BASIC"
+    },
+    {
+      "checked_at": "2026-07-23T00:13:31Z",
+      "price": 156.79,
+      "cabin": "BASIC"
     }
   ],
   "sfo-san-nov27-29": [
     {
       "checked_at": "2026-07-11T22:50:52Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC",
-      "note": "Baseline check — cheapest bookable round-trip fare (Basic Economy). Cheapest standard Economy fare same day was $448.61. Thanksgiving-weekend travel."
+      "note": "Baseline check \u2014 cheapest bookable round-trip fare (Basic Economy). Cheapest standard Economy fare same day was $448.61. Thanksgiving-weekend travel."
     },
     {
       "checked_at": "2026-07-12T00:13:26Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC"
     },
     {
@@ -301,82 +306,82 @@
     },
     {
       "checked_at": "2026-07-15T06:13:19Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC"
     },
     {
       "checked_at": "2026-07-15T12:13:26Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC"
     },
     {
       "checked_at": "2026-07-15T18:14:07Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC"
     },
     {
       "checked_at": "2026-07-16T00:13:22Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC"
     },
     {
       "checked_at": "2026-07-16T06:13:50Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC"
     },
     {
       "checked_at": "2026-07-16T12:14:00Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC"
     },
     {
       "checked_at": "2026-07-16T18:14:00Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC"
     },
     {
       "checked_at": "2026-07-17T00:13:21Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC"
     },
     {
       "checked_at": "2026-07-17T07:28:23Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC"
     },
     {
       "checked_at": "2026-07-17T12:13:20Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC"
     },
     {
       "checked_at": "2026-07-17T18:13:46Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC"
     },
     {
       "checked_at": "2026-07-18T00:13:07Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC"
     },
     {
       "checked_at": "2026-07-18T06:13:20Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC"
     },
     {
       "checked_at": "2026-07-18T12:13:22Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC"
     },
     {
       "checked_at": "2026-07-18T18:13:37Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC"
     },
     {
       "checked_at": "2026-07-19T01:21:57Z",
-      "price": 383.60,
+      "price": 383.6,
       "cabin": "BASIC"
     },
     {
@@ -451,6 +456,11 @@
     },
     {
       "checked_at": "2026-07-22T18:16:00Z",
+      "price": 326.8,
+      "cabin": "BASIC"
+    },
+    {
+      "checked_at": "2026-07-23T00:13:31Z",
       "price": 326.8,
       "cabin": "BASIC"
     }
