@@ -149,13 +149,13 @@
 </div>
 
 <div class="connect-note">
-  ✅ <strong>Square:</strong> refreshed successfully this run — 3 bookings this week (Patty Shales, 2 vehicles; Dorsa Zahedi; JohnMichael Saffer), $322.99 collected (2 paid jobs), 1 still unpaid/quoted (Patty Shales, ~$559.98).<br>
-  📞 <strong>Quo calls:</strong> refreshed successfully this run — 33 calls, 17 inbound, 16 outbound, 2 missed, avg 1m 17s.<br>
+  ✅ <strong>Square:</strong> refreshed successfully this run — 2 bookings so far this week (Eric Dailey; Mersedeh Emrani), $0 collected yet, both still ACCEPTED/unpaid (~$279.99, ~$309.99).<br>
+  📞 <strong>Quo calls:</strong> refreshed successfully this run — 0 calls so far this week.<br>
   ⭐ <strong>Google Reviews:</strong> no new reviews since last run. Overall total: 115.<br>
   🛠️ <strong>Backlog:</strong> no incomplete historical weeks found this run.<br>
   Hit &#8635; Refresh above to pull the latest numbers again.
 </div>
-<div class="last-updated" id="lastUpdated">Last updated: Jul 26, 2026 · Morning refresh PT (Square, Quo, and Reviews all refreshed successfully this run)</div>
+<div class="last-updated" id="lastUpdated">Last updated: Jul 27, 2026 · Morning refresh PT (Square, Quo, and Reviews all refreshed successfully this run)</div>
 
 <script>
 const WEEKS = [
@@ -395,10 +395,26 @@ const WEEKS = [
     ],
     apptTag: "Square Bookings",
     quoStats: { total: 33, inbound: 17, outbound: 16, missed: 2, avg: "1m 17s" }
+  },
+  {
+    label: "July 27 – August 2, 2026",
+    shortLabel: "July 27–Aug 2",
+    revenue: "$0",
+    orders: 0,
+    avgPerJob: "—",
+    bookings: 2,
+    calls: { total: 0, inbound: 0, outbound: 0, missed: 0, avg: "0m 0s" },
+    reviews: { count: 0, rating: "4.9", total: 115, names: [] },
+    appointments: [
+      { date: "Jul 27", time: "2:00 PM",  notes: "Eric Dailey · Full Detail (Van / Trucks / SUV) · Mercedes-Benz GLE 53 · 10636 Wilshire Unit #502, LA 90024 · Detailer: Abdul", status: "ACCEPTED", chip: "chip-g", revenue: "~$279.99" },
+      { date: "Jul 28", time: "12:30 PM", notes: "Mersedeh Emrani · Full Detail (Sedan / Coupe) + Add on: Additional Interior Care · 1800 Colby Ave Apt 103, LA 90025", status: "ACCEPTED", chip: "chip-g", revenue: "~$309.99" }
+    ],
+    apptTag: "Square Bookings",
+    quoStats: { total: 0, inbound: 0, outbound: 0, missed: 0, avg: "0m 0s" }
   }
 ];
 
-let current = 12; // Start on current week (Jul 20–26)
+let current = 13; // Start on current week (Jul 27–Aug 2)
 
 function render(i) {
   const w = WEEKS[i];
@@ -511,7 +527,7 @@ async function runRefresh() {
   } catch(e) {
     btn.textContent = '↻ Refresh';
     btn.disabled = false;
-    sendPrompt('Please refresh the Detail Smart dashboard — pull the latest Square orders, bookings, and Quo calls for this week (Jul 20–26) and update the artifact.');
+    sendPrompt('Please refresh the Detail Smart dashboard — pull the latest Square orders, bookings, and Quo calls for this week (Jul 27–Aug 2) and update the artifact.');
   }
 }
 
