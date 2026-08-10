@@ -149,13 +149,13 @@
 </div>
 
 <div class="connect-note">
-  ⚠️ <strong>Square:</strong> connector needs re-authorization — could not refresh this run. Bookings/revenue numbers below are unchanged since the last successful pull (Aug 6): 3 bookings this week (Katie Lee · PAID $209.99; Carolyn Amir · Aug 7 · ACCEPTED ~$199.99; Jessica Nawrocki · Aug 9 · ACCEPTED ~$309.99), $209.99 collected so far.<br>
-  📞 <strong>Quo calls:</strong> refreshed successfully this run — 13 calls this week (10 inbound, 3 outbound, 0 missed, avg 2m 7s).<br>
+  ⚠️ <strong>Square:</strong> connector still needs re-authorization — could not refresh bookings/revenue for the new week (Aug 10–16) or repair the Aug 3–9 backlog week. No Square data available this run.<br>
+  📞 <strong>Quo calls:</strong> refreshed successfully this run — 0 calls so far this week (week just started).<br>
   ⭐ <strong>Google Reviews:</strong> no new reviews since last run. Overall total: 115.<br>
-  🛠️ <strong>Backlog:</strong> no incomplete historical weeks found this run.<br>
+  🛠️ <strong>Backlog:</strong> Aug 3–9 week is still incomplete (needs re-auth, stale since Aug 6) — will retry on a future run once Square access is restored.<br>
   Hit &#8635; Refresh above to pull the latest numbers again.
 </div>
-<div class="last-updated" id="lastUpdated">Last updated: Aug 7, 2026 · Morning refresh PT (Quo and Reviews refreshed successfully; Square skipped — needs re-authorization)</div>
+<div class="last-updated" id="lastUpdated">Last updated: Aug 10, 2026 · Morning refresh PT (Quo and Reviews refreshed successfully; Square skipped — needs re-authorization)</div>
 
 <script>
 const WEEKS = [
@@ -428,10 +428,23 @@ const WEEKS = [
     ],
     apptTag: "Square Bookings — needs re-auth (stale since Aug 6)",
     quoStats: { total: 13, inbound: 10, outbound: 3, missed: 0, avg: "2m 7s" }
+  },
+  {
+    label: "Aug 10 – Aug 16, 2026",
+    shortLabel: "Aug 10–16",
+    revenue: "—",
+    orders: "—",
+    avgPerJob: "—",
+    bookings: "—",
+    calls: { total: 0, inbound: 0, outbound: 0, missed: 0, avg: "—" },
+    reviews: { count: 0, rating: "4.9", total: 115, names: [] },
+    appointments: [],
+    apptTag: "Square Bookings — unavailable (needs re-auth)",
+    quoStats: { total: 0, inbound: 0, outbound: 0, missed: 0, avg: "—" }
   }
 ];
 
-let current = 14; // Start on current week (Aug 3–9)
+let current = 15; // Start on current week (Aug 10–16)
 
 function render(i) {
   const w = WEEKS[i];
