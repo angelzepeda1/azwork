@@ -149,13 +149,13 @@
 </div>
 
 <div class="connect-note">
-  ⚠️ <strong>Square:</strong> connector still needs re-authorization — could not refresh bookings/revenue for the new week (Aug 10–16) or repair the Aug 3–9 backlog week. No Square data available this run.<br>
-  📞 <strong>Quo calls:</strong> refreshed successfully this run — 0 calls so far this week (week just started).<br>
+  ⚠️ <strong>Square:</strong> connector still needs re-authorization — could not refresh bookings/revenue for this week (Aug 10–16) or repair the Aug 3–9 backlog week. No Square data available this run.<br>
+  📞 <strong>Quo calls:</strong> refreshed successfully this run — 5 calls this week (5 inbound, 1 missed, avg 2m 15s).<br>
   ⭐ <strong>Google Reviews:</strong> no new reviews since last run. Overall total: 115.<br>
   🛠️ <strong>Backlog:</strong> Aug 3–9 week is still incomplete (needs re-auth, stale since Aug 6) — will retry on a future run once Square access is restored.<br>
   Hit &#8635; Refresh above to pull the latest numbers again.
 </div>
-<div class="last-updated" id="lastUpdated">Last updated: Aug 10, 2026 · Morning refresh PT (Quo and Reviews refreshed successfully; Square skipped — needs re-authorization)</div>
+<div class="last-updated" id="lastUpdated">Last updated: Aug 11, 2026 · Morning refresh PT (Quo and Reviews refreshed successfully; Square skipped — needs re-authorization)</div>
 
 <script>
 const WEEKS = [
@@ -436,11 +436,11 @@ const WEEKS = [
     orders: "—",
     avgPerJob: "—",
     bookings: "—",
-    calls: { total: 0, inbound: 0, outbound: 0, missed: 0, avg: "—" },
+    calls: { total: 5, inbound: 5, outbound: 0, missed: 1, avg: "2m 15s" },
     reviews: { count: 0, rating: "4.9", total: 115, names: [] },
     appointments: [],
     apptTag: "Square Bookings — unavailable (needs re-auth)",
-    quoStats: { total: 0, inbound: 0, outbound: 0, missed: 0, avg: "—" }
+    quoStats: { total: 5, inbound: 5, outbound: 0, missed: 1, avg: "2m 15s" }
   }
 ];
 
