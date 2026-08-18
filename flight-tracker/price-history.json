@@ -750,6 +750,11 @@
       "checked_at": "2026-08-18T00:14:51Z",
       "price": 153.79,
       "cabin": "BASIC"
+    },
+    {
+      "checked_at": "2026-08-18T06:16:27Z",
+      "price": 136.8,
+      "cabin": "BASIC"
     }
   ],
   "sfo-san-nov27-29": [
@@ -1501,6 +1506,11 @@
     },
     {
       "checked_at": "2026-08-18T00:14:51Z",
+      "price": 247.8,
+      "cabin": "BASIC"
+    },
+    {
+      "checked_at": "2026-08-18T06:16:27Z",
       "price": 247.8,
       "cabin": "BASIC"
     }
