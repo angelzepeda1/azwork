@@ -149,13 +149,13 @@
 </div>
 
 <div class="connect-note">
-  ⚠️ <strong>Square:</strong> connector still needs re-authorization (7th consecutive daily run) — could not refresh bookings/revenue for this week (Aug 17–23), or repair the Aug 3–9 and Aug 10–16 backlog weeks. No Square data available this run.<br>
-  📞 <strong>Quo calls:</strong> refreshed successfully this run — 16 calls so far this week (12 inbound, 4 outbound, 0 missed, avg 2m 18s).<br>
+  ⚠️ <strong>Square:</strong> connector still needs re-authorization (8th consecutive daily run) — could not refresh bookings/revenue for this week (Aug 17–23), or repair the Aug 3–9 and Aug 10–16 backlog weeks. No Square data available this run.<br>
+  📞 <strong>Quo calls:</strong> refreshed successfully this run — 20 calls so far this week (16 inbound, 4 outbound, 0 missed, avg 2m 36s).<br>
   ⭐ <strong>Google Reviews:</strong> no new reviews since last run. Overall total: 115.<br>
   🛠️ <strong>Backlog:</strong> Aug 3–9 (stale since Aug 6) and Aug 10–16 (unavailable) are still incomplete — will retry on a future run once Square access is restored.<br>
   Hit &#8635; Refresh above to pull the latest numbers again.
 </div>
-<div class="last-updated" id="lastUpdated">Last updated: Aug 20, 2026 · Morning refresh PT (Quo and Reviews refreshed successfully; Square skipped — needs re-authorization, 7th consecutive day)</div>
+<div class="last-updated" id="lastUpdated">Last updated: Aug 21, 2026 · Morning refresh PT (Quo and Reviews refreshed successfully; Square skipped — needs re-authorization, 8th consecutive day)</div>
 
 <script>
 const WEEKS = [
@@ -449,11 +449,11 @@ const WEEKS = [
     orders: "—",
     avgPerJob: "—",
     bookings: "—",
-    calls: { total: 16, inbound: 12, outbound: 4, missed: 0, avg: "2m 18s" },
+    calls: { total: 20, inbound: 16, outbound: 4, missed: 0, avg: "2m 36s" },
     reviews: { count: 0, rating: "4.9", total: 115, names: [] },
     appointments: [],
     apptTag: "Square Bookings — unavailable (needs re-auth)",
-    quoStats: { total: 16, inbound: 12, outbound: 4, missed: 0, avg: "2m 18s" }
+    quoStats: { total: 20, inbound: 16, outbound: 4, missed: 0, avg: "2m 36s" }
   }
 ];
 
