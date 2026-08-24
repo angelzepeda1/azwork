@@ -149,13 +149,13 @@
 </div>
 
 <div class="connect-note">
-  ⚠️ <strong>Square:</strong> connector still needs re-authorization (9th consecutive daily run) — could not refresh bookings/revenue for this week (Aug 17–23), or repair the Aug 3–9 and Aug 10–16 backlog weeks. No Square data available this run.<br>
-  📞 <strong>Quo calls:</strong> also needs re-authorization this run — showing last known figures: 20 calls so far this week (16 inbound, 4 outbound, 0 missed, avg 2m 36s).<br>
+  ⚠️ <strong>Square:</strong> connector still needs re-authorization (10th consecutive daily run) — could not refresh bookings/revenue for this week (Aug 24–30), or repair the Aug 10–16 and Aug 17–23 backlog weeks. No Square data available this run.<br>
+  📞 <strong>Quo calls:</strong> also needs re-authorization this run — no call data available yet for this new week.<br>
   ⭐ <strong>Google Reviews:</strong> no new reviews since last run. Overall total: 115.<br>
-  🛠️ <strong>Backlog:</strong> Aug 3–9 (stale since Aug 6) and Aug 10–16 (unavailable) are still incomplete — will retry on a future run once Square access is restored.<br>
+  🛠️ <strong>Backlog:</strong> Aug 10–16 and Aug 17–23 are still incomplete — will retry on a future run once Square access is restored.<br>
   Hit &#8635; Refresh above to pull the latest numbers again.
 </div>
-<div class="last-updated" id="lastUpdated">Last updated: Aug 23, 2026 · Morning refresh PT (Reviews refreshed successfully — no new reviews; Square and Quo both skipped — need re-authorization, Square 9th consecutive day)</div>
+<div class="last-updated" id="lastUpdated">Last updated: Aug 24, 2026 · Morning refresh PT (Reviews refreshed successfully — no new reviews; Square and Quo both skipped — need re-authorization, Square 3rd week running)</div>
 
 <script>
 const WEEKS = [
@@ -454,10 +454,23 @@ const WEEKS = [
     appointments: [],
     apptTag: "Square Bookings — unavailable (needs re-auth, 9th consecutive day)",
     quoStats: { total: 20, inbound: 16, outbound: 4, missed: 0, avg: "2m 36s" }
+  },
+  {
+    label: "Aug 24 – Aug 30, 2026",
+    shortLabel: "Aug 24–30",
+    revenue: "—",
+    orders: "—",
+    avgPerJob: "—",
+    bookings: "—",
+    calls: null,
+    reviews: { count: 0, rating: "4.9", total: 115, names: [] },
+    appointments: [],
+    apptTag: "Square Bookings — unavailable (needs re-auth, 3rd week running)",
+    quoStats: null
   }
 ];
 
-let current = 16; // Start on current week (Aug 17–23)
+let current = 17; // Start on current week (Aug 24–30)
 
 function render(i) {
   const w = WEEKS[i];
