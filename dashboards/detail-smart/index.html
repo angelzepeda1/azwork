@@ -149,13 +149,13 @@
 </div>
 
 <div class="connect-note">
-  ⚠️ <strong>Square:</strong> connector still needs re-authorization (16th consecutive daily run) — could not refresh bookings/revenue for this week (Aug 24–30), or repair the Aug 10–16 and Aug 17–23 backlog weeks. No Square data available this run.<br>
-  📞 <strong>Quo calls:</strong> also needs re-authorization this run — no call data available yet for this new week.<br>
+  ⚠️ <strong>Square:</strong> connector still needs re-authorization (17+ consecutive daily runs) — could not refresh bookings/revenue for this week (Aug 31–Sep 6), or repair the Aug 3–9, Aug 10–16, Aug 17–23, or Aug 24–30 backlog weeks. No Square data available this run.<br>
+  📞 <strong>Quo calls:</strong> also needs re-authorization this run — no call data available for this new week.<br>
   ⭐ <strong>Google Reviews:</strong> no new reviews since last run. Overall total: 115.<br>
-  🛠️ <strong>Backlog:</strong> Aug 10–16 and Aug 17–23 are still incomplete — will retry on a future run once Square access is restored.<br>
+  🛠️ <strong>Backlog:</strong> Aug 3–9, Aug 10–16, Aug 17–23, and Aug 24–30 are still incomplete — will retry on a future run once Square access is restored.<br>
   Hit &#8635; Refresh above to pull the latest numbers again.
 </div>
-<div class="last-updated" id="lastUpdated">Last updated: Aug 30, 2026 · Morning refresh PT (Reviews refreshed successfully — no new reviews; Square and Quo both skipped — need re-authorization, Square 3rd week running, 16 days straight)</div>
+<div class="last-updated" id="lastUpdated">Last updated: Sep 1, 2026 · Morning refresh PT (Reviews refreshed successfully — no new reviews; Square and Quo both skipped — need re-authorization, 4th week running, 17+ days straight)</div>
 
 <script>
 const WEEKS = [
@@ -467,10 +467,23 @@ const WEEKS = [
     appointments: [],
     apptTag: "Square Bookings — unavailable (needs re-auth, 3rd week running, 16 days straight)",
     quoStats: null
+  },
+  {
+    label: "Aug 31 – Sep 6, 2026",
+    shortLabel: "Aug 31–Sep 6",
+    revenue: "—",
+    orders: "—",
+    avgPerJob: "—",
+    bookings: "—",
+    calls: null,
+    reviews: { count: 0, rating: "4.9", total: 115, names: [] },
+    appointments: [],
+    apptTag: "Square Bookings — unavailable (needs re-auth, 4th week running, 17+ days straight)",
+    quoStats: null
   }
 ];
 
-let current = 17; // Start on current week (Aug 24–30)
+let current = 18; // Start on current week (Aug 31–Sep 6)
 
 function render(i) {
   const w = WEEKS[i];
@@ -583,7 +596,7 @@ async function runRefresh() {
   } catch(e) {
     btn.textContent = '↻ Refresh';
     btn.disabled = false;
-    sendPrompt('Please refresh the Detail Smart dashboard — pull the latest Square orders, bookings, and Quo calls for this week (Aug 3–9) and update the artifact.');
+    sendPrompt('Please refresh the Detail Smart dashboard — pull the latest Square orders, bookings, and Quo calls for this week (Aug 31–Sep 6) and update the artifact.');
   }
 }
 
