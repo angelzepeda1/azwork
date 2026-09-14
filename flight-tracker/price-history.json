@@ -4,7 +4,7 @@
       "checked_at": "2026-07-11T22:46:20Z",
       "price": 176.81,
       "cabin": "BASIC",
-      "note": "Baseline check \u2014 cheapest bookable round-trip fare (Basic Economy). Cheapest standard Economy fare same day was $246.81."
+      "note": "Baseline check — cheapest bookable round-trip fare (Basic Economy). Cheapest standard Economy fare same day was $246.81."
     },
     {
       "checked_at": "2026-07-12T00:13:26Z",
@@ -1180,6 +1180,11 @@
       "checked_at": "2026-09-14T12:17:11Z",
       "price": 276.41,
       "cabin": "BASIC"
+    },
+    {
+      "checked_at": "2026-09-14T18:13:33Z",
+      "price": 256.81,
+      "cabin": "BASIC"
     }
   ],
   "sfo-san-nov27-29": [
@@ -1187,7 +1192,7 @@
       "checked_at": "2026-07-11T22:50:52Z",
       "price": 383.6,
       "cabin": "BASIC",
-      "note": "Baseline check \u2014 cheapest bookable round-trip fare (Basic Economy). Cheapest standard Economy fare same day was $448.61. Thanksgiving-weekend travel."
+      "note": "Baseline check — cheapest bookable round-trip fare (Basic Economy). Cheapest standard Economy fare same day was $448.61. Thanksgiving-weekend travel."
     },
     {
       "checked_at": "2026-07-12T00:13:26Z",
@@ -2361,6 +2366,11 @@
     },
     {
       "checked_at": "2026-09-14T12:17:11Z",
+      "price": 324.8,
+      "cabin": "BASIC"
+    },
+    {
+      "checked_at": "2026-09-14T18:13:33Z",
       "price": 324.8,
       "cabin": "BASIC"
     }
