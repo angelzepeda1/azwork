@@ -149,13 +149,13 @@
 </div>
 
 <div class="connect-note">
-  ⚠️ <strong>Square:</strong> connector still needs re-authorization (52+ consecutive daily runs) — could not refresh bookings/revenue for this week (Sep 21–27), or repair the Aug 3–9, Aug 10–16, Aug 17–23, Aug 24–30, Aug 31–Sep 6, Sep 7–13, or Sep 14–20 backlog weeks. No Square data available this run. This MCP connector is not authorized in this session and needs the owner to reconnect it via claude.ai connector settings — a full disconnect/reconnect, since simple re-authorization has not fixed it over 7+ weeks of daily retries.<br>
+  ⚠️ <strong>Square:</strong> connector still needs re-authorization (59+ consecutive daily runs) — could not refresh bookings/revenue for this week (Sep 28–Oct 4), or repair the Aug 3–9, Aug 10–16, Aug 17–23, Aug 24–30, Aug 31–Sep 6, Sep 7–13, Sep 14–20, or Sep 21–27 backlog weeks. No Square data available this run. This MCP connector is not authorized in this session and needs the owner to reconnect it via claude.ai connector settings — a full disconnect/reconnect, since simple re-authorization has not fixed it over 8+ weeks of daily retries.<br>
   📞 <strong>Quo calls:</strong> also unauthorized this run — no call data available for this week.<br>
-  ⭐ <strong>Google Reviews:</strong> no new reviews since last run. Overall total: 115.<br>
-  🛠️ <strong>Backlog:</strong> Aug 3–9, Aug 10–16, Aug 17–23, Aug 24–30, Aug 31–Sep 6, Sep 7–13, and Sep 14–20 are still incomplete — will retry on a future run once Square access is restored.<br>
+  ⭐ <strong>Google Reviews:</strong> 1 new review this week (Rasmita). Overall total: 116.<br>
+  🛠️ <strong>Backlog:</strong> Aug 3–9, Aug 10–16, Aug 17–23, Aug 24–30, Aug 31–Sep 6, Sep 7–13, Sep 14–20, and Sep 21–27 are still incomplete — will retry on a future run once Square access is restored.<br>
   Hit &#8635; Refresh above to pull the latest numbers again.
 </div>
-<div class="last-updated" id="lastUpdated">Last updated: Sep 27, 2026 · Morning refresh PT (Reviews refreshed successfully — no new reviews; Square and Quo both skipped — not authorized in this session, 7th week running, 52 days straight)</div>
+<div class="last-updated" id="lastUpdated">Last updated: Sep 29, 2026 · Morning refresh PT (Reviews refreshed successfully — 1 new review; Square and Quo both skipped — not authorized in this session, 8th week running, 59 days straight)</div>
 
 <script>
 const WEEKS = [
@@ -519,10 +519,23 @@ const WEEKS = [
     appointments: [],
     apptTag: "Square Bookings — unavailable (needs re-auth, 7th week running, 52 days straight)",
     quoStats: null
+  },
+  {
+    label: "Sep 28 – Oct 4, 2026",
+    shortLabel: "Sep 28–Oct 4",
+    revenue: "—",
+    orders: "—",
+    avgPerJob: "—",
+    bookings: "—",
+    calls: null,
+    reviews: { count: 1, rating: "4.9", total: 116, names: ["Rasmita"] },
+    appointments: [],
+    apptTag: "Square Bookings — unavailable (needs re-auth, 8th week running, 59 days straight)",
+    quoStats: null
   }
 ];
 
-let current = 21; // Start on current week (Sep 21–27)
+let current = 22; // Start on current week (Sep 28–Oct 4)
 
 function render(i) {
   const w = WEEKS[i];
@@ -635,7 +648,7 @@ async function runRefresh() {
   } catch(e) {
     btn.textContent = '↻ Refresh';
     btn.disabled = false;
-    sendPrompt('Please refresh the Detail Smart dashboard — pull the latest Square orders, bookings, and Quo calls for this week (Sep 21–27) and update the artifact.');
+    sendPrompt('Please refresh the Detail Smart dashboard — pull the latest Square orders, bookings, and Quo calls for this week (Sep 28–Oct 4) and update the artifact.');
   }
 }
 
