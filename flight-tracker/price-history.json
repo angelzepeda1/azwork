@@ -2828,6 +2828,11 @@
       "checked_at": "2026-10-01T12:14:33Z",
       "price": 303.81,
       "cabin": "ECONOMY"
+    },
+    {
+      "checked_at": "2026-10-01T18:15:14Z",
+      "price": 323.8,
+      "cabin": "ECONOMY"
     }
   ]
 }
