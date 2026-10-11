@@ -3018,6 +3018,11 @@
       "checked_at": "2026-10-11T00:13:27Z",
       "price": 317.8,
       "cabin": "BASIC"
+    },
+    {
+      "checked_at": "2026-10-11T06:13:53Z",
+      "price": 327.8,
+      "cabin": "BASIC"
     }
   ]
 }
